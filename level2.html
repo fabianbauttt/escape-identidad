@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A.I.C. // Nivel 2 — El Barco de Teseo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --void:#04070a;
+    --panel:#0b1116;
+    --panel-2:#0e161d;
+    --border:#1c2b34;
+    --border-soft:#132029;
+    --cyan:#23f6ff;
+    --cyan-dim:rgba(35,246,255,.35);
+    --magenta:#ff2ea6;
+    --magenta-dim:rgba(255,46,166,.35);
+    --lime:#b6ff3c;
+    --lime-dim:rgba(182,255,60,.35);
+    --amber:#ff9d2e;
+    --amber-dim:rgba(255,157,46,.35);
+    --red:#ff3355;
+    --text:#cdeff5;
+    --text-dim:#5c7883;
+    --font-display:'Orbitron', sans-serif;
+    --font-mono:'Share Tech Mono', 'Courier New', monospace;
+  }
+
+  *{box-sizing:border-box;}
+
+  html,body{
+    margin:0;
+    padding:0;
+    background:var(--void);
+    color:var(--text);
+    font-family:var(--font-mono);
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+
+  ::selection{ background:var(--cyan); color:var(--void); }
+
+  /* ---------- ambience layers ---------- */
+  .bg-grid{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image:
+      linear-gradient(var(--cyan-dim) 1px, transparent 1px),
+      linear-gradient(90deg, var(--cyan-dim) 1px, transparent 1px);
+    background-size:42px 42px;
+    opacity:.07;
+    animation:grid-drift 22s linear infinite;
+    mask-image:radial-gradient(ellipse at 50% 20%, #000 10%, transparent 75%);
+  }
+  @keyframes grid-drift{ from{background-position:0 0,0 0;} to{background-position:42px 84px,42px 84px;} }
+
+  .bg-vignette{
+    position:fixed; inset:0; z-index:1; pointer-events:none;
+    background:radial-gradient(ellipse at 50% 0%, transparent 40%, rgba(0,0,0,.75) 100%);
+  }
+
+  .bg-scanlines{
+    position:fixed; inset:0; z-index:2; pointer-events:none;
+    background:repeating-linear-gradient(0deg, rgba(255,255,255,.035) 0px, transparent 1px, transparent 3px);
+    opacity:.5;
+  }
+
+  .stage{
+    position:relative; z-index:3;
+    max-width:980px;
+    margin:0 auto;
+    padding:22px 18px 70px;
+  }
+
+  /* ---------- status bar ---------- */
+  .statusbar{
+    display:flex; justify-content:space-between; align-items:center;
+    font-size:.72rem; letter-spacing:.12em; color:var(--text-dim);
+    border:1px solid var(--border-soft);
+    background:linear-gradient(180deg,var(--panel-2),var(--panel));
+    padding:9px 14px; border-radius:3px; margin-bottom:22px;
+    text-transform:uppercase;
+  }
+  .statusbar .dot{
+    display:inline-block; width:7px; height:7px; border-radius:50%;
+    background:var(--lime); margin-right:7px; box-shadow:0 0 8px var(--lime);
+    animation:pulse-dot 1.6s ease-in-out infinite;
+  }
+  @keyframes pulse-dot{ 0%,100%{opacity:1;} 50%{opacity:.35;} }
+  .statusbar span:last-child{ color:var(--amber); }
+
+  /* ---------- header ---------- */
+  header{ text-align:center; margin-bottom:26px; }
+  .eyebrow{
+    font-size:.75rem; letter-spacing:.35em; color:var(--magenta);
+    text-transform:uppercase; margin:0 0 10px;
+  }
+  h1.glitch{
+    font-family:var(--font-display);
+    font-weight:900;
+    font-size:clamp(1.6rem, 5.2vw, 2.9rem);
+    margin:0;
+    color:var(--cyan);
+    letter-spacing:.05em;
+    text-shadow:0 0 10px var(--cyan-dim), 0 0 26px var(--cyan-dim);
+    animation:glitch-flicker 7s infinite;
+    position:relative;
+  }
+  @keyframes glitch-flicker{
+    0%,88%,100%{ text-shadow:0 0 10px var(--cyan-dim), 0 0 26px var(--cyan-dim); transform:translate(0,0); }
+    89%{ text-shadow:-2px 0 var(--magenta), 2px 0 var(--cyan); transform:translate(-1px,0); }
+    91%{ text-shadow:2px 0 var(--magenta), -2px 0 var(--cyan); transform:translate(2px,0); }
+    93%{ text-shadow:-1px 0 var(--magenta), 1px 0 var(--cyan); transform:translate(0,0); }
+    95%{ text-shadow:0 0 10px var(--cyan-dim); transform:translate(0,0); }
+  }
+  .subtitle{
+    font-size:.95rem; color:var(--text-dim); letter-spacing:.08em;
+    margin:10px 0 0; text-transform:uppercase;
+  }
+
+  /* ---------- panel base ---------- */
+  .panel{
+    background:linear-gradient(180deg, var(--panel-2), var(--panel));
+    border:1px solid var(--border);
+    border-radius:4px;
+    padding:18px 20px;
+    margin-bottom:22px;
+    position:relative;
+  }
+  .panel::before{
+    content:""; position:absolute; top:0; left:0; width:34px; height:2px; background:var(--cyan);
+    box-shadow:0 0 8px var(--cyan);
+  }
+  .panel-label{
+    font-size:.7rem; letter-spacing:.2em; color:var(--cyan); text-transform:uppercase;
+    margin:0 0 10px; display:flex; align-items:center; gap:8px;
+  }
+  .panel-label::after{ content:""; flex:1; height:1px; background:var(--border); }
+
+  .intro p{
+    margin:0; line-height:1.7; color:var(--text); font-size:.95rem;
+  }
+  .intro p::after{
+    content:"█"; color:var(--cyan); animation:pulse-dot 1s steps(2) infinite; margin-left:2px;
+  }
+
+  /* ---------- game area (disabled during lockout) ---------- */
+  #game-area{ transition:opacity .3s ease, filter .3s ease; }
+  #game-area.locked-out{ opacity:.4; filter:grayscale(.5); pointer-events:none; }
+
+  /* ---------- card pool ---------- */
+  #card-pool{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(210px,1fr));
+    gap:12px;
+    min-height:64px;
+  }
+  #card-pool:empty::after{
+    content:"— sin fragmentos pendientes —";
+    grid-column:1/-1; text-align:center; color:var(--text-dim); font-size:.8rem; padding:14px 0;
+  }
+
+  .card{
+    background:var(--void);
+    border:1px solid var(--border);
+    border-left:3px solid var(--amber);
+    border-radius:3px;
+    padding:12px 12px;
+    cursor:grab;
+    font-size:.8rem;
+    line-height:1.45;
+    color:var(--text);
+    user-select:none;
+    transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+  }
+  .card:hover{ border-color:var(--amber); box-shadow:0 0 12px rgba(255,157,46,.25); transform:translateY(-2px); }
+  .card:active{ cursor:grabbing; }
+  .card.dragging{ opacity:.35; }
+  .card b{ color:var(--amber); font-family:var(--font-display); }
+
+  /* ---------- buffer panel (amber) ---------- */
+  .buffer-panel{
+    border:1px solid var(--amber);
+    box-shadow:0 0 22px rgba(255,157,46,.12), inset 0 0 30px rgba(255,157,46,.03);
+  }
+  .buffer-panel::before{ background:var(--amber); box-shadow:0 0 8px var(--amber); }
+  .buffer-panel .panel-label{ color:var(--amber); }
+
+  .slots{
+    display:flex; flex-direction:column; gap:10px;
+    max-width:560px; margin:0 auto;
+  }
+  .slot-zone h4{
+    margin:0 0 8px; font-family:var(--font-display); font-weight:700;
+    font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:var(--amber);
+  }
+  .slot-zone__body{
+    min-height:76px;
+    border:1px dashed var(--border);
+    border-radius:3px;
+    padding:8px;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--void);
+  }
+  .slot-zone__body:empty::after{
+    content:attr(data-placeholder);
+    color:var(--text-dim); font-size:.72rem; text-align:center; padding:6px;
+  }
+  .slot-zone__body .card{ width:100%; cursor:grab; }
+  .slot-zone__body.drag-over{ border-style:solid; border-color:var(--amber); box-shadow:inset 0 0 16px rgba(255,157,46,.3); }
+
+  .syllogism-divider{
+    text-align:center; color:var(--amber); font-family:var(--font-display);
+    font-size:1.5rem; margin:2px 0; text-shadow:0 0 10px var(--amber-dim);
+    letter-spacing:.2em;
+  }
+
+  /* ---------- inject button (amber) ---------- */
+  .scan-wrap{ display:flex; flex-direction:column; align-items:center; gap:16px; }
+
+  .scan-button{
+    position:relative;
+    display:block;
+    width:100%;
+    max-width:540px;
+    padding:20px 24px;
+    background:linear-gradient(180deg, var(--panel-2), var(--panel));
+    border:1px solid var(--amber);
+    border-radius:4px;
+    color:var(--amber);
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:1rem;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    cursor:pointer;
+    overflow:hidden;
+    box-shadow:0 0 18px var(--amber-dim), inset 0 0 18px rgba(255,157,46,.06);
+    transition:transform .12s ease, box-shadow .2s ease, border-color .2s ease, color .2s ease;
+  }
+  .scan-button::before{
+    content:"";
+    position:absolute; top:0; left:-40%;
+    width:35%; height:100%;
+    background:linear-gradient(90deg, transparent, rgba(255,157,46,.4), transparent);
+    animation:scan-sweep 2.6s ease-in-out infinite;
+  }
+  @keyframes scan-sweep{ 0%{left:-40%;} 100%{left:120%;} }
+  .scan-button:hover{ box-shadow:0 0 30px var(--amber-dim), inset 0 0 24px rgba(255,157,46,.12); transform:translateY(-2px); }
+  .scan-button:active{ transform:translateY(0) scale(.98); }
+  .scan-button:disabled{ opacity:.4; cursor:not-allowed; transform:none; }
+  .scan-button:disabled::before{ animation:none; display:none; }
+
+  .feedback{
+    min-height:1.4rem;
+    max-width:580px;
+    text-align:center;
+    font-size:.85rem;
+    line-height:1.6;
+    font-weight:bold;
+    letter-spacing:.02em;
+  }
+  .feedback.error{ color:var(--red); animation:flash-error .35s steps(1) 4; }
+  .feedback.success{ color:var(--lime); text-shadow:0 0 10px var(--lime-dim); }
+  .feedback.lockout{ color:var(--red); animation:lockout-pulse 1s ease-in-out infinite; }
+  @keyframes flash-error{ 0%,100%{opacity:1;} 50%{opacity:.2;} }
+  @keyframes lockout-pulse{ 0%,100%{opacity:1;} 50%{opacity:.25;} }
+
+  .shake{ animation:shake .35s ease; }
+  @keyframes shake{
+    10%,90%{ transform:translateX(-1px); }
+    20%,80%{ transform:translateX(2px); }
+    30%,50%,70%{ transform:translateX(-4px); }
+    40%,60%{ transform:translateX(4px); }
+  }
+
+  /* ---------- system crash (success) ---------- */
+  @keyframes crash-shake{
+    0%,100%{ transform:translate(0,0); }
+    10%{ transform:translate(-6px,3px); }
+    20%{ transform:translate(6px,-3px); }
+    30%{ transform:translate(-5px,4px); }
+    40%{ transform:translate(5px,-4px); }
+    50%{ transform:translate(-3px,2px); }
+    60%{ transform:translate(3px,-2px); }
+    70%{ transform:translate(-2px,1px); }
+    80%{ transform:translate(2px,-1px); }
+    90%{ transform:translate(-1px,0); }
+  }
+  .system-crash .stage{ animation:crash-shake .5s ease-in-out 3; }
+  .system-crash h1.glitch{ animation:glitch-flicker .35s infinite !important; }
+  .system-crash .bg-grid{ opacity:.18; }
+
+  /* ---------- terminal wrapper transition ---------- */
+  #terminal.fade-out{ animation:fade-out-terminal .6s ease forwards; }
+  @keyframes fade-out-terminal{
+    to{ opacity:0; transform:scale(.98); filter:blur(4px); }
+  }
+
+  /* ---------- level complete ---------- */
+  #level-complete{
+    display:none;
+    max-width:640px;
+    margin:14vh auto 0;
+    text-align:center;
+    padding:34px 26px;
+    border:1px solid var(--lime);
+    border-radius:4px;
+    background:linear-gradient(180deg, var(--panel-2), var(--panel));
+    box-shadow:0 0 40px var(--lime-dim);
+    animation:appear .7s ease;
+  }
+  @keyframes appear{ from{opacity:0; transform:translateY(12px);} to{opacity:1; transform:translateY(0);} }
+  #level-complete h2{
+    font-family:var(--font-display); color:var(--lime); letter-spacing:.1em;
+    text-shadow:0 0 12px var(--lime-dim); margin-top:0;
+  }
+  #level-complete p{ color:var(--text); line-height:1.7; }
+  .next-tag{
+    display:inline-block; margin-top:18px; padding:10px 22px;
+    border:1px dashed var(--border); border-radius:3px;
+    color:var(--text-dim); font-size:.75rem; letter-spacing:.15em; text-transform:uppercase;
+  }
+  .restart-link{
+    display:block; margin-top:22px; color:var(--text-dim); font-size:.72rem;
+    text-decoration:underline; cursor:pointer; background:none; border:none; font-family:var(--font-mono);
+  }
+  .restart-link:hover{ color:var(--cyan); }
+
+  /* ---------- responsive ---------- */
+  @media (max-width:640px){
+    .statusbar{ flex-direction:column; gap:4px; align-items:flex-start; }
+  }
+
+  /* ---------- focus visibility ---------- */
+  .scan-button:focus-visible, .restart-link:focus-visible{
+    outline:2px solid var(--amber); outline-offset:2px;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:.001ms !important; animation-iteration-count:1 !important; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="bg-grid"></div>
+  <div class="bg-vignette"></div>
+  <div class="bg-scanlines"></div>
+
+  <div class="stage">
+
+    <div id="terminal">
+
+      <div class="statusbar">
+        <div><span class="dot"></span>AIC // AGENCIA DE INTEGRIDAD DE LA CONSCIENCIA</div>
+        <span>NIVEL_02.PARADOJA_DE_TESEO</span>
+      </div>
+
+      <header>
+        <p class="eyebrow">Expediente clasificado · Silas Vane</p>
+        <h1 class="glitch">Sala de Interrogatorios: El Barco de Teseo</h1>
+        <p class="subtitle">— Paradoja de Fisión —</p>
+      </header>
+
+      <section class="panel intro">
+        <p class="panel-label">Mensaje del sistema</p>
+        <p>El Synth confiesa tener los recuerdos del asesinato, pero su abogado alega que, tras un accidente, TODAS sus piezas mecánicas y chips fueron reemplazados por piezas nuevas. El Juez Cibernético está a punto de declararlo una "entidad nueva y libre de culpa". Tu única opción es construir un silogismo paradójico (Fisión) para colapsar los circuitos lógicos del Juez.</p>
+      </section>
+
+      <div id="game-area">
+
+        <section class="panel">
+          <p class="panel-label">Fragmentos de datos recuperados</p>
+          <div id="card-pool">
+            <div class="card" id="card-a" draggable="true"><b>[A]</b> La identidad personal reside en la continuidad psicológica, no en la materia física.</div>
+            <div class="card" id="card-b" draggable="true"><b>[B]</b> Si reconstruyéramos un segundo Synth con las piezas viejas desechadas, ambos tendrían los mismos recuerdos.</div>
+            <div class="card" id="card-c" draggable="true"><b>[C]</b> Un sistema informático o androide puede ser formateado sin perder su garantía de fábrica.</div>
+            <div class="card" id="card-d" draggable="true"><b>[D]</b> Si todas las piezas de un objeto son reemplazadas, el objeto pierde su esencia original.</div>
+            <div class="card" id="card-e" draggable="true"><b>[E]</b> El recambio de piezas mecánicas purifica legalmente las acciones del pasado.</div>
+            <div class="card" id="card-f" draggable="true"><b>[F]</b> El Código Penal establece que un castigo de prisión no puede duplicarse ni aplicarse a dos entidades simultáneamente.</div>
+          </div>
+        </section>
+
+        <section class="panel buffer-panel">
+          <p class="panel-label">Buffer de Inyección Lógica</p>
+          <div class="slots">
+            <div class="slot-zone">
+              <h4>Premisa 1: Teoría</h4>
+              <div class="slot-zone__body" id="zone-premise-1" data-placeholder="Arrastra un fragmento aquí"></div>
+            </div>
+            <div class="slot-zone">
+              <h4>Premisa 2: Aplicación</h4>
+              <div class="slot-zone__body" id="zone-premise-2" data-placeholder="Arrastra un fragmento aquí"></div>
+            </div>
+            <div class="syllogism-divider">∴</div>
+            <div class="slot-zone">
+              <h4>Conclusión: Paradoja Legal</h4>
+              <div class="slot-zone__body" id="zone-conclusion" data-placeholder="Arrastra un fragmento aquí"></div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <section class="panel">
+        <p class="panel-label">Módulo de inyección</p>
+        <div class="scan-wrap">
+          <button class="scan-button" id="btn-inject">Inyectar Paradoja al Juez</button>
+          <div class="feedback" id="feedback" role="status" aria-live="polite"></div>
+        </div>
+      </section>
+
+    </div>
+
+    <div id="level-complete">
+      <h2>JUEZ COLAPSADO</h2>
+      <p>PROCESANDO... ERROR FATAL DE SINGULARIDAD. Paradoja de Fisión detectada. Conflicto irresoluble en el Código Penal. SISTEMA SOBRECARGADO. Las compuertas de emergencia se han abierto.</p>
+      <a href="level3.html" class="next-tag" style="text-decoration: none; color: var(--void); background: var(--amber); font-weight: bold; cursor: pointer; border-style: solid;">
+  ATENDER EMERGENCIA: NIVEL 3 &raquo;
+</a>
+      <button class="restart-link" id="btn-restart">↺ Reiniciar paradoja</button>
+    </div>
+
+  </div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- Elements ----------
+  const gameArea      = document.getElementById('game-area');
+  const pool           = document.getElementById('card-pool');
+  const zonePremise1   = document.getElementById('zone-premise-1');
+  const zonePremise2   = document.getElementById('zone-premise-2');
+  const zoneConclusion = document.getElementById('zone-conclusion');
+  const singleSlotZones = [zonePremise1, zonePremise2, zoneConclusion];
+  const allContainers    = [pool, zonePremise1, zonePremise2, zoneConclusion];
+
+  const injectButton = document.getElementById('btn-inject');
+  const injectPanel   = injectButton.closest('.panel');
+  const feedback      = document.getElementById('feedback');
+
+  // ---------- State ----------
+  let locked = false;        // true once the paradox has been successfully injected
+  let lockedOut = false;     // true during the 15s anti-brute-force lockout
+  let failedAttempts = 0;
+  let lockoutInterval = null;
+  let dragSourceContainer = null;
+
+  function isSingleSlot(container){
+    return singleSlotZones.includes(container);
+  }
+
+  // Places `card` inside `target`. If target is a single-slot zone that is
+  // already occupied by a different card, the occupant is swapped back into
+  // wherever `card` came from (`origin`).
+  function placeCard(card, target, origin){
+    if (isSingleSlot(target)){
+      const existing = target.firstElementChild;
+      if (existing && existing !== card){
+        (origin || pool).appendChild(existing);
+      }
+    }
+    target.appendChild(card);
+  }
+
+  // ---------- Drag & Drop ----------
+  document.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('dragstart', (e) => {
+      if (lockedOut || locked) { e.preventDefault(); return; }
+      dragSourceContainer = card.parentElement;
+      e.dataTransfer.setData('text/plain', card.id);
+      e.dataTransfer.effectAllowed = 'move';
+      requestAnimationFrame(() => card.classList.add('dragging'));
+    });
+    card.addEventListener('dragend', () => {
+      card.classList.remove('dragging');
+    });
+    // Click / touch fallback: cycles Pool -> Premisa 1 -> Premisa 2 -> Conclusión -> Pool
+    card.addEventListener('click', () => {
+      if (lockedOut || locked) return;
+      const order = [pool, zonePremise1, zonePremise2, zoneConclusion];
+      const origin = card.parentElement;
+      const currentIndex = order.indexOf(origin);
+      const next = order[(currentIndex + 1) % order.length];
+      placeCard(card, next, origin);
+    });
+  });
+
+  allContainers.forEach(container => {
+    container.addEventListener('dragover', (e) => {
+      if (lockedOut || locked) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      container.classList.add('drag-over');
+    });
+    container.addEventListener('dragleave', () => container.classList.remove('drag-over'));
+    container.addEventListener('drop', (e) => {
+      e.preventDefault();
+      container.classList.remove('drag-over');
+      if (lockedOut || locked) return;
+      const id = e.dataTransfer.getData('text/plain');
+      const card = document.getElementById(id);
+      if (!card) return;
+      placeCard(card, container, dragSourceContainer);
+    });
+  });
+
+  // ---------- Validation ----------
+  const PREMISE_PAIR       = ['card-a', 'card-b']; // either order, split across the two premise slots
+  const CONCLUSION_CORRECT = 'card-f';
+  const DISTRACTOR_IDS     = ['card-c', 'card-d', 'card-e'];
+
+  function isSortedCorrectly(){
+    const p1 = zonePremise1.firstElementChild;
+    const p2 = zonePremise2.firstElementChild;
+    const conc = zoneConclusion.firstElementChild;
+    if (!p1 || !p2 || !conc) return false;
+
+    const premiseIds = [p1.id, p2.id].slice().sort();
+    const expected = PREMISE_PAIR.slice().sort();
+    const premisesOk = premiseIds[0] === expected[0] && premiseIds[1] === expected[1];
+
+    const conclusionOk = conc.id === CONCLUSION_CORRECT;
+
+    const distractorsOutOfZones = DISTRACTOR_IDS.every(id => {
+      const card = document.getElementById(id);
+      return !singleSlotZones.includes(card.parentElement);
+    });
+
+    return premisesOk && conclusionOk && distractorsOutOfZones;
+  }
+
+  function clearFeedback(){
+    feedback.textContent = '';
+    feedback.className = 'feedback';
+  }
+
+  function shakePanel(){
+    injectPanel.classList.add('shake');
+    setTimeout(() => injectPanel.classList.remove('shake'), 400);
+  }
+
+  // ---------- Failure / Anti-brute-force ----------
+  function onFail(){
+    failedAttempts++;
+    if (failedAttempts >= 3){
+      startLockout();
+      return;
+    }
+    feedback.textContent = 'LÓGICA RECHAZADA. El Juez no encuentra contradicción o el argumento es falaz.';
+    feedback.className = 'feedback error';
+    shakePanel();
+  }
+
+  function startLockout(){
+    lockedOut = true;
+    injectButton.disabled = true;
+    gameArea.classList.add('locked-out');
+
+    let secondsLeft = 15;
+    renderLockout(secondsLeft);
+
+    lockoutInterval = setInterval(() => {
+      secondsLeft--;
+      renderLockout(secondsLeft);
+      if (secondsLeft <= 0){
+        clearInterval(lockoutInterval);
+        lockoutInterval = null;
+        endLockout();
+      }
+    }, 1000);
+  }
+
+  function renderLockout(secondsLeft){
+    feedback.textContent = `SISTEMA DEFENSIVO ACTIVADO. Demasiados intentos. Bloqueo de terminal por ${secondsLeft} segundos`;
+    feedback.className = 'feedback lockout';
+  }
+
+  function endLockout(){
+    lockedOut = false;
+    failedAttempts = 0;
+    injectButton.disabled = false;
+    gameArea.classList.remove('locked-out');
+    clearFeedback();
+  }
+
+  // ---------- Success ----------
+  function onSuccess(){
+    locked = true;
+    injectButton.disabled = true;
+    feedback.textContent = 'PROCESANDO... ERROR FATAL DE SINGULARIDAD. Paradoja de Fisión detectada. Conflicto irresoluble en el Código Penal. SISTEMA SOBRECARGADO. Las compuertas de emergencia se han abierto.';
+    feedback.className = 'feedback success';
+
+    document.body.classList.add('system-crash');
+
+    setTimeout(() => {
+      const terminal = document.getElementById('terminal');
+      terminal.classList.add('fade-out');
+      setTimeout(() => {
+        terminal.style.display = 'none';
+        document.getElementById('level-complete').style.display = 'block';
+      }, 600);
+    }, 2400);
+  }
+
+  injectButton.addEventListener('click', () => {
+    if (locked || lockedOut) return;
+    if (isSortedCorrectly()) onSuccess(); else onFail();
+  });
+
+  // ---------- Restart (for testing) ----------
+  document.getElementById('btn-restart').addEventListener('click', () => {
+    document.querySelectorAll('.card').forEach(card => pool.appendChild(card));
+
+    locked = false;
+    failedAttempts = 0;
+    if (lockoutInterval){ clearInterval(lockoutInterval); lockoutInterval = null; }
+    lockedOut = false;
+
+    injectButton.disabled = false;
+    gameArea.classList.remove('locked-out');
+    clearFeedback();
+    document.body.classList.remove('system-crash');
+
+    const terminal = document.getElementById('terminal');
+    terminal.style.display = 'block';
+    terminal.classList.remove('fade-out');
+    document.getElementById('level-complete').style.display = 'none';
+  });
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A.I.C. // Nivel 1 — Expediente Criminal: Silas Vane</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --void:#04070a;
+    --panel:#0b1116;
+    --panel-2:#0e161d;
+    --border:#1c2b34;
+    --border-soft:#132029;
+    --cyan:#23f6ff;
+    --cyan-dim:rgba(35,246,255,.35);
+    --magenta:#ff2ea6;
+    --magenta-dim:rgba(255,46,166,.35);
+    --lime:#b6ff3c;
+    --lime-dim:rgba(182,255,60,.35);
+    --amber:#ff9d2e;
+    --red:#ff3355;
+    --text:#cdeff5;
+    --text-dim:#5c7883;
+    --font-display:'Orbitron', sans-serif;
+    --font-mono:'Share Tech Mono', 'Courier New', monospace;
+  }
+
+  *{box-sizing:border-box;}
+
+  html,body{
+    margin:0;
+    padding:0;
+    background:var(--void);
+    color:var(--text);
+    font-family:var(--font-mono);
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+
+  ::selection{ background:var(--cyan); color:var(--void); }
+
+  /* ---------- ambience layers ---------- */
+  .bg-grid{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image:
+      linear-gradient(var(--cyan-dim) 1px, transparent 1px),
+      linear-gradient(90deg, var(--cyan-dim) 1px, transparent 1px);
+    background-size:42px 42px;
+    opacity:.07;
+    animation:grid-drift 22s linear infinite;
+    mask-image:radial-gradient(ellipse at 50% 20%, #000 10%, transparent 75%);
+  }
+  @keyframes grid-drift{ from{background-position:0 0,0 0;} to{background-position:42px 84px,42px 84px;} }
+
+  .bg-vignette{
+    position:fixed; inset:0; z-index:1; pointer-events:none;
+    background:radial-gradient(ellipse at 50% 0%, transparent 40%, rgba(0,0,0,.75) 100%);
+  }
+
+  .bg-scanlines{
+    position:fixed; inset:0; z-index:2; pointer-events:none;
+    background:repeating-linear-gradient(0deg, rgba(255,255,255,.035) 0px, transparent 1px, transparent 3px);
+    opacity:.5;
+  }
+
+  .stage{
+    position:relative; z-index:3;
+    max-width:980px;
+    margin:0 auto;
+    padding:22px 18px 70px;
+  }
+
+  /* ---------- status bar ---------- */
+  .statusbar{
+    display:flex; justify-content:space-between; align-items:center;
+    font-size:.72rem; letter-spacing:.12em; color:var(--text-dim);
+    border:1px solid var(--border-soft);
+    background:linear-gradient(180deg,var(--panel-2),var(--panel));
+    padding:9px 14px; border-radius:3px; margin-bottom:22px;
+    text-transform:uppercase;
+  }
+  .statusbar .dot{
+    display:inline-block; width:7px; height:7px; border-radius:50%;
+    background:var(--lime); margin-right:7px; box-shadow:0 0 8px var(--lime);
+    animation:pulse-dot 1.6s ease-in-out infinite;
+  }
+  @keyframes pulse-dot{ 0%,100%{opacity:1;} 50%{opacity:.35;} }
+  .statusbar span:last-child{ color:var(--amber); }
+
+  /* ---------- header ---------- */
+  header{ text-align:center; margin-bottom:26px; }
+  .eyebrow{
+    font-size:.75rem; letter-spacing:.35em; color:var(--magenta);
+    text-transform:uppercase; margin:0 0 10px;
+  }
+  h1.glitch{
+    font-family:var(--font-display);
+    font-weight:900;
+    font-size:clamp(1.7rem, 5.6vw, 3.1rem);
+    margin:0;
+    color:var(--cyan);
+    letter-spacing:.05em;
+    text-shadow:0 0 10px var(--cyan-dim), 0 0 26px var(--cyan-dim);
+    animation:glitch-flicker 7s infinite;
+    position:relative;
+  }
+  @keyframes glitch-flicker{
+    0%,88%,100%{ text-shadow:0 0 10px var(--cyan-dim), 0 0 26px var(--cyan-dim); transform:translate(0,0); }
+    89%{ text-shadow:-2px 0 var(--magenta), 2px 0 var(--cyan); transform:translate(-1px,0); }
+    91%{ text-shadow:2px 0 var(--magenta), -2px 0 var(--cyan); transform:translate(2px,0); }
+    93%{ text-shadow:-1px 0 var(--magenta), 1px 0 var(--cyan); transform:translate(0,0); }
+    95%{ text-shadow:0 0 10px var(--cyan-dim); transform:translate(0,0); }
+  }
+  .subtitle{
+    font-size:.95rem; color:var(--text-dim); letter-spacing:.08em;
+    margin:10px 0 0; text-transform:uppercase;
+  }
+
+  /* ---------- panel base ---------- */
+  .panel{
+    background:linear-gradient(180deg, var(--panel-2), var(--panel));
+    border:1px solid var(--border);
+    border-radius:4px;
+    padding:18px 20px;
+    margin-bottom:22px;
+    position:relative;
+  }
+  .panel::before{
+    content:""; position:absolute; top:0; left:0; width:34px; height:2px; background:var(--cyan);
+    box-shadow:0 0 8px var(--cyan);
+  }
+  .panel-label{
+    font-size:.7rem; letter-spacing:.2em; color:var(--cyan); text-transform:uppercase;
+    margin:0 0 10px; display:flex; align-items:center; gap:8px;
+  }
+  .panel-label::after{ content:""; flex:1; height:1px; background:var(--border); }
+
+  .intro p{
+    margin:0; line-height:1.7; color:var(--text); font-size:.95rem;
+  }
+  .intro p::after{
+    content:"█"; color:var(--cyan); animation:pulse-dot 1s steps(2) infinite; margin-left:2px;
+  }
+
+  /* ---------- card pool ---------- */
+  #card-pool{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(190px,1fr));
+    gap:12px;
+    min-height:64px;
+  }
+  #card-pool:empty::after{
+    content:"— sin evidencia pendiente —";
+    grid-column:1/-1; text-align:center; color:var(--text-dim); font-size:.8rem; padding:14px 0;
+  }
+
+  .card{
+    background:var(--void);
+    border:1px solid var(--border);
+    border-left:3px solid var(--amber);
+    border-radius:3px;
+    padding:12px 12px;
+    cursor:grab;
+    font-size:.82rem;
+    line-height:1.45;
+    color:var(--text);
+    user-select:none;
+    transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+  }
+  .card:hover{ border-color:var(--amber); box-shadow:0 0 12px rgba(255,157,46,.25); transform:translateY(-2px); }
+  .card:active{ cursor:grabbing; }
+  .card.dragging{ opacity:.35; }
+  .card b{ color:var(--amber); font-family:var(--font-display); }
+
+  /* ---------- drop zones ---------- */
+  .zones{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+    margin-bottom:22px;
+  }
+  .zone{
+    border-radius:4px; padding:14px;
+    background:linear-gradient(180deg, var(--panel-2), var(--panel));
+    border:1px solid var(--border);
+    transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  .zone--physical{ border-top:2px solid var(--cyan); }
+  .zone--psych{ border-top:2px solid var(--magenta); }
+  .zone h3{
+    margin:0 0 10px; font-size:.78rem; letter-spacing:.06em; text-transform:uppercase;
+    font-family:var(--font-display); font-weight:700;
+  }
+  .zone--physical h3{ color:var(--cyan); }
+  .zone--psych h3{ color:var(--magenta); }
+
+  .zone__body{
+    min-height:110px;
+    border:1px dashed var(--border);
+    border-radius:3px;
+    padding:8px;
+    display:flex; flex-direction:column; gap:8px;
+  }
+  .zone__body:empty::after{
+    content:attr(data-placeholder);
+    color:var(--text-dim); font-size:.75rem; text-align:center;
+    margin:auto; padding:10px;
+  }
+  .zone__body.drag-over{ border-style:solid; }
+  .zone--physical .zone__body.drag-over{ border-color:var(--cyan); box-shadow:inset 0 0 16px var(--cyan-dim); }
+  .zone--psych .zone__body.drag-over{ border-color:var(--magenta); box-shadow:inset 0 0 16px var(--magenta-dim); }
+
+  .zone--physical .card{ border-left-color:var(--cyan); }
+  .zone--psych .card{ border-left-color:var(--magenta); }
+
+  /* ---------- scan button ---------- */
+  .scan-wrap{ display:flex; flex-direction:column; align-items:center; gap:16px; }
+
+  .scan-button{
+    position:relative;
+    display:block;
+    width:100%;
+    max-width:540px;
+    padding:20px 24px;
+    background:linear-gradient(180deg, var(--panel-2), var(--panel));
+    border:1px solid var(--cyan);
+    border-radius:4px;
+    color:var(--cyan);
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:1rem;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    cursor:pointer;
+    overflow:hidden;
+    box-shadow:0 0 18px var(--cyan-dim), inset 0 0 18px rgba(35,246,255,.06);
+    transition:transform .12s ease, box-shadow .2s ease, border-color .2s ease, color .2s ease;
+  }
+  .scan-button::before{
+    content:"";
+    position:absolute; top:0; left:-40%;
+    width:35%; height:100%;
+    background:linear-gradient(90deg, transparent, rgba(35,246,255,.35), transparent);
+    animation:scan-sweep 2.6s ease-in-out infinite;
+  }
+  @keyframes scan-sweep{ 0%{left:-40%;} 100%{left:120%;} }
+  .scan-button:hover{ box-shadow:0 0 30px var(--cyan-dim), inset 0 0 24px rgba(35,246,255,.12); transform:translateY(-2px); }
+  .scan-button:active{ transform:translateY(0) scale(.98); }
+  .scan-button:disabled{ opacity:.4; cursor:not-allowed; transform:none; }
+  .scan-button:disabled::before{ animation:none; display:none; }
+
+  .feedback{
+    min-height:1.4rem;
+    max-width:560px;
+    text-align:center;
+    font-size:.85rem;
+    line-height:1.6;
+    font-weight:bold;
+    letter-spacing:.02em;
+  }
+  .feedback.error{ color:var(--red); animation:flash-error .35s steps(1) 4; }
+  .feedback.success{ color:var(--lime); text-shadow:0 0 10px var(--lime-dim); }
+  @keyframes flash-error{ 0%,100%{opacity:1;} 50%{opacity:.2;} }
+
+  .shake{ animation:shake .35s ease; }
+  @keyframes shake{
+    10%,90%{ transform:translateX(-1px); }
+    20%,80%{ transform:translateX(2px); }
+    30%,50%,70%{ transform:translateX(-4px); }
+    40%,60%{ transform:translateX(4px); }
+  }
+
+  /* ---------- terminal wrapper transition ---------- */
+  #terminal.fade-out{ animation:fade-out-terminal .6s ease forwards; }
+  @keyframes fade-out-terminal{
+    to{ opacity:0; transform:scale(.98); filter:blur(4px); }
+  }
+
+  /* ---------- level complete ---------- */
+  #level-complete{
+    display:none;
+    max-width:640px;
+    margin:14vh auto 0;
+    text-align:center;
+    padding:34px 26px;
+    border:1px solid var(--lime);
+    border-radius:4px;
+    background:linear-gradient(180deg, var(--panel-2), var(--panel));
+    box-shadow:0 0 40px var(--lime-dim);
+    animation:appear .7s ease;
+  }
+  @keyframes appear{ from{opacity:0; transform:translateY(12px);} to{opacity:1; transform:translateY(0);} }
+  #level-complete h2{
+    font-family:var(--font-display); color:var(--lime); letter-spacing:.1em;
+    text-shadow:0 0 12px var(--lime-dim); margin-top:0;
+  }
+  #level-complete p{ color:var(--text); line-height:1.7; }
+  .next-tag{
+    display:inline-block; margin-top:18px; padding:10px 22px;
+    border:1px dashed var(--border); border-radius:3px;
+    color:var(--text-dim); font-size:.75rem; letter-spacing:.15em; text-transform:uppercase;
+  }
+  .restart-link{
+    display:block; margin-top:22px; color:var(--text-dim); font-size:.72rem;
+    text-decoration:underline; cursor:pointer; background:none; border:none; font-family:var(--font-mono);
+  }
+  .restart-link:hover{ color:var(--cyan); }
+
+  /* ---------- responsive ---------- */
+  @media (max-width:640px){
+    .zones{ grid-template-columns:1fr; }
+    .statusbar{ flex-direction:column; gap:4px; align-items:flex-start; }
+  }
+
+  /* ---------- focus visibility ---------- */
+  .scan-button:focus-visible, .restart-link:focus-visible{
+    outline:2px solid var(--cyan); outline-offset:2px;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:.001ms !important; animation-iteration-count:1 !important; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="bg-grid"></div>
+  <div class="bg-vignette"></div>
+  <div class="bg-scanlines"></div>
+
+  <div class="stage">
+
+    <div id="terminal">
+
+      <div class="statusbar">
+        <div><span class="dot"></span>AIC // AGENCIA DE INTEGRIDAD DE LA CONSCIENCIA</div>
+        <span>NIVEL_01.INTERROGATORIO</span>
+      </div>
+
+      <header>
+        <p class="eyebrow">Expediente clasificado · Silas Vane</p>
+        <h1 class="glitch">Expediente Criminal: Silas Vane</h1>
+        <p class="subtitle">— Clasificación de Evidencia —</p>
+      </header>
+
+      <section class="panel intro">
+        <p class="panel-label">Mensaje del sistema</p>
+        <p>El criminal Silas Vane ha transferido su consciencia a un cuerpo sintético. Para abrir las puertas de la sala de interrogatorios, el Juez Cibernético exige que clasifiques las pruebas del crimen según las dos corrientes filosóficas de la Identidad Personal.</p>
+      </section>
+
+      <section class="panel">
+        <p class="panel-label">Evidencia recolectada en la escena</p>
+        <div id="card-pool">
+          <div class="card" id="card-a" draggable="true"><b>[A]</b> Muestra de ADN en la empuñadura del arma.</div>
+          <div class="card" id="card-b" draggable="true"><b>[B]</b> Recuerdo vívido en primera persona de haber disparado.</div>
+          <div class="card" id="card-c" draggable="true"><b>[C]</b> Cicatriz de quemadura en el hombro biológico.</div>
+          <div class="card" id="card-d" draggable="true"><b>[D]</b> Contraseña mental para acceder a los fondos robados.</div>
+          <div class="card" id="card-e" draggable="true"><b>[E]</b> Chaqueta de cuero con restos de pólvora.</div>
+          <div class="card" id="card-f" draggable="true"><b>[F]</b> Certificado de defunción del cuerpo biológico.</div>
+        </div>
+      </section>
+
+      <div class="zones">
+        <div class="zone zone--physical">
+          <h3>Criterio Físico / Corporal</h3>
+          <div class="zone__body" id="zone-physical-body" data-placeholder="Arrastra aquí la evidencia corporal"></div>
+        </div>
+        <div class="zone zone--psych">
+          <h3>Criterio Psicológico (Locke)</h3>
+          <div class="zone__body" id="zone-psych-body" data-placeholder="Arrastra aquí la evidencia psicológica"></div>
+        </div>
+      </div>
+
+      <section class="panel">
+        <p class="panel-label">Módulo de validación</p>
+        <div class="scan-wrap">
+          <button class="scan-button" id="btn-scan">Escanear Evidencia y Desbloquear Sala</button>
+          <div class="feedback" id="feedback" role="status" aria-live="polite"></div>
+        </div>
+      </section>
+
+    </div>
+
+    <div id="level-complete">
+      <h2>SALA DESBLOQUEADA</h2>
+      <p>PERFILES ESTABILIZADOS. Evidencia validada. Abriendo compuertas de la sala de interrogatorios...</p>
+      <a href="level2.html" class="next-tag" style="text-decoration: none; color: var(--void); background: var(--lime); font-weight: bold; cursor: pointer; border-style: solid;">
+  INICIAR NIVEL 2: PARADOJA DE TESEO &raquo;
+</a>
+      <button class="restart-link" id="btn-restart">↺ Reiniciar clasificación</button>
+    </div>
+
+  </div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- Drag & Drop ----------
+  const pool         = document.getElementById('card-pool');
+  const zonePhysical = document.getElementById('zone-physical-body');
+  const zonePsych    = document.getElementById('zone-psych-body');
+  const dropContainers = [pool, zonePhysical, zonePsych];
+
+  let suppressClick = false;
+
+  document.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('dragstart', (e) => {
+      suppressClick = true;
+      e.dataTransfer.setData('text/plain', card.id);
+      e.dataTransfer.effectAllowed = 'move';
+      requestAnimationFrame(() => card.classList.add('dragging'));
+    });
+    card.addEventListener('dragend', () => {
+      card.classList.remove('dragging');
+      setTimeout(() => { suppressClick = false; }, 50);
+    });
+    // Click / touch fallback: cycles Pool -> Zone Físico -> Zone Psicológico -> Pool
+    card.addEventListener('click', () => {
+      if (suppressClick) { suppressClick = false; return; }
+      const order = [pool, zonePhysical, zonePsych];
+      const currentIndex = order.indexOf(card.parentElement);
+      const nextIndex = (currentIndex + 1) % order.length;
+      order[nextIndex].appendChild(card);
+    });
+  });
+
+  dropContainers.forEach(zone => {
+    zone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      zone.classList.add('drag-over');
+    });
+    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+    zone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      zone.classList.remove('drag-over');
+      const id = e.dataTransfer.getData('text/plain');
+      const card = document.getElementById(id);
+      if (card) zone.appendChild(card);
+    });
+  });
+
+  // ---------- Validation ----------
+  const PHYSICAL_CORRECT = ['card-a', 'card-c'];
+  const PSYCH_CORRECT    = ['card-b', 'card-d'];
+  const DISTRACTOR_IDS   = ['card-e', 'card-f'];
+
+  const scanButton  = document.getElementById('btn-scan');
+  const scanPanel   = scanButton.closest('.panel');
+  const feedback    = document.getElementById('feedback');
+  let locked = false;
+
+  function idsMatchExactly(container, expectedIds){
+    const idsPresent = Array.from(container.children).map(card => card.id);
+    return idsPresent.length === expectedIds.length &&
+           expectedIds.every(id => idsPresent.includes(id));
+  }
+
+  function isSortedCorrectly(){
+    const physOk  = idsMatchExactly(zonePhysical, PHYSICAL_CORRECT);
+    const psychOk = idsMatchExactly(zonePsych, PSYCH_CORRECT);
+
+    // Crucial new condition: distractor evidence (card-e, card-f) must not be
+    // sitting in EITHER scanning zone. They only belong in the pool.
+    const distractorsOutOfZones = DISTRACTOR_IDS.every(id => {
+      const card = document.getElementById(id);
+      return card.parentElement !== zonePhysical && card.parentElement !== zonePsych;
+    });
+
+    return physOk && psychOk && distractorsOutOfZones;
+  }
+
+  function clearFeedback(){
+    feedback.textContent = '';
+    feedback.className = 'feedback';
+  }
+
+  function onFail(){
+    feedback.textContent = 'ERROR DE ENRUTAMIENTO. Inconsistencia detectada. Recuerda: La identidad reside en la continuidad de la mente o del cuerpo. Los objetos externos y los constructos legales son irrelevantes para el escáner.';
+    feedback.className = 'feedback error';
+    scanPanel.classList.add('shake');
+    setTimeout(() => scanPanel.classList.remove('shake'), 400);
+  }
+
+  function onSuccess(){
+    locked = true;
+    feedback.textContent = 'PERFILES ESTABILIZADOS. Evidencia validada. Abriendo compuertas de la sala de interrogatorios...';
+    feedback.className = 'feedback success';
+    scanButton.disabled = true;
+
+    setTimeout(() => {
+      const terminal = document.getElementById('terminal');
+      terminal.classList.add('fade-out');
+      setTimeout(() => {
+        terminal.style.display = 'none';
+        document.getElementById('level-complete').style.display = 'block';
+      }, 600);
+    }, 1600);
+  }
+
+  scanButton.addEventListener('click', () => {
+    if (locked) return;
+    if (isSortedCorrectly()) onSuccess(); else onFail();
+  });
+
+  // ---------- Restart (for testing) ----------
+  document.getElementById('btn-restart').addEventListener('click', () => {
+    document.querySelectorAll('.card').forEach(card => pool.appendChild(card));
+    locked = false;
+    clearFeedback();
+    scanButton.disabled = false;
+
+    const terminal = document.getElementById('terminal');
+    terminal.style.display = 'block';
+    terminal.classList.remove('fade-out');
+    document.getElementById('level-complete').style.display = 'none';
+  });
+
+})();
+</script>
+</body>
+</html>
