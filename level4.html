@@ -131,6 +131,13 @@
     margin:10px 0 0; text-transform:uppercase;
   }
 
+  .progress-wrap{ text-align:center; margin-bottom:22px; }
+  .progress-track{ display:flex; justify-content:center; gap:6px; margin-bottom:6px; }
+  .progress-step{ width:34px; height:4px; border-radius:2px; background:var(--border); }
+  .progress-step.is-done{ background:var(--lime); box-shadow:0 0 6px var(--lime-dim); }
+  .progress-step.is-active{ background:var(--cyan); box-shadow:0 0 8px var(--cyan-dim); }
+  .progress-label{ font-size:.68rem; letter-spacing:.2em; color:var(--text-dim); text-transform:uppercase; margin:0; }
+
   /* ---------- panel base ---------- */
   .panel{
     background:linear-gradient(180deg, var(--panel-2), var(--panel));
@@ -156,6 +163,47 @@
   .intro p::after{
     content:"█"; color:var(--red); animation:pulse-dot .8s steps(2) infinite; margin-left:2px;
   }
+  .intro .panel-label, .intro-message{ visibility:hidden; }
+
+  /* ---------- briefing gate ---------- */
+  #rest-of-screen{ display:none; }
+  #rest-of-screen.visible{ display:block; animation:appear-gate .5s ease; }
+  @keyframes appear-gate{ from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+
+  .begin-wrap{ display:none; justify-content:center; margin:-6px 0 22px; }
+  .begin-wrap.visible{ display:flex; animation:appear-gate .4s ease; }
+  .begin-button{
+    position:relative;
+    padding:16px 40px;
+    background:linear-gradient(180deg, var(--panel-2), var(--panel));
+    border:1px solid var(--cyan);
+    border-radius:4px;
+    color:var(--cyan);
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:.95rem;
+    letter-spacing:.15em;
+    text-transform:uppercase;
+    cursor:pointer;
+    overflow:hidden;
+    box-shadow:0 0 18px var(--cyan-dim), inset 0 0 18px rgba(35,246,255,.06);
+    animation:begin-pulse 2s ease-in-out infinite;
+    transition:transform .12s ease;
+  }
+  @keyframes begin-pulse{
+    0%,100%{ box-shadow:0 0 18px var(--cyan-dim), inset 0 0 18px rgba(35,246,255,.06); }
+    50%{ box-shadow:0 0 30px var(--cyan-dim), inset 0 0 24px rgba(35,246,255,.12); }
+  }
+  .begin-button::before{
+    content:"";
+    position:absolute; top:0; left:-40%; width:35%; height:100%;
+    background:linear-gradient(90deg, transparent, rgba(35,246,255,.4), transparent);
+    animation:begin-sweep 2.4s ease-in-out infinite;
+  }
+  @keyframes begin-sweep{ 0%{left:-40%;} 100%{left:120%;} }
+  .begin-button:hover{ transform:translateY(-2px); }
+  .begin-button:active{ transform:translateY(0) scale(.98); }
+  .begin-button:focus-visible{ outline:2px solid var(--cyan); outline-offset:2px; }
 
   /* ---------- timer ---------- */
   .timer-wrap{ text-align:center; }
@@ -367,10 +415,63 @@
 
   #screen-success{ border:1px solid var(--lime); box-shadow:0 0 40px var(--lime-dim); }
   #screen-success h2{ color:var(--lime); text-shadow:0 0 12px var(--lime-dim); }
-  .final-time{
+  .certificate{
+    margin:22px auto 0;
+    max-width:460px;
+    border:1px solid var(--lime);
+    border-radius:6px;
+    padding:26px 22px;
+    position:relative;
+    background:linear-gradient(180deg, rgba(182,255,60,.05), transparent);
+  }
+  .certificate-seal{
+    position:absolute; top:14px; right:16px;
+    width:68px; height:68px;
+    border:2px solid var(--lime);
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    transform:rotate(-14deg);
+    font-family:var(--font-display); font-weight:900; font-size:.6rem;
+    letter-spacing:.05em; color:var(--lime); text-align:center;
+    text-shadow:0 0 8px var(--lime-dim);
+    box-shadow:0 0 14px var(--lime-dim);
+  }
+  .certificate-heading{
+    font-size:.66rem; letter-spacing:.2em; text-transform:uppercase; color:var(--text-dim); margin:0 0 8px;
+  }
+  .certificate-title{
+    font-family:var(--font-display); font-weight:700; font-size:1rem; letter-spacing:.03em;
+    color:var(--lime); margin:0 0 16px; text-shadow:0 0 10px var(--lime-dim);
+  }
+  .certificate-body{ font-size:.85rem; color:var(--text); margin:4px 0; line-height:1.5; }
+  .certificate-names{
     font-family:var(--font-display); font-weight:700; font-size:1.05rem;
-    color:var(--lime); letter-spacing:.1em; margin-top:16px !important;
-    text-shadow:0 0 10px var(--lime-dim);
+    color:var(--cyan); margin:8px 0; text-shadow:0 0 8px var(--cyan-dim);
+  }
+  .certificate-meta{
+    display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;
+    margin-top:18px; padding-top:14px; border-top:1px dashed var(--border);
+    font-size:.7rem; color:var(--text-dim); letter-spacing:.03em;
+  }
+  .end-actions{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:20px; }
+
+  @media print{
+    .bg-grid, .bg-alarm, .bg-vignette, .bg-scanlines, #timeout-overlay, .end-actions, #screen-fail{
+      display:none !important;
+    }
+    body{ background:#fff !important; }
+    #screen-success{
+      position:static !important; margin:0 auto !important;
+      border:2px solid #000 !important; box-shadow:none !important; background:#fff !important;
+    }
+    #screen-success h2, #screen-success p, #screen-success .next-tag{
+      color:#000 !important; text-shadow:none !important; border-color:#000 !important;
+    }
+    .certificate{ border-color:#000 !important; background:none !important; }
+    .certificate-seal{ border-color:#000 !important; color:#000 !important; text-shadow:none !important; box-shadow:none !important; }
+    .certificate-heading, .certificate-body, .certificate-meta{ color:#000 !important; }
+    .certificate-title, .certificate-names{ color:#000 !important; text-shadow:none !important; }
+    .certificate-meta{ border-top-color:#000 !important; }
   }
 
   .next-tag{
@@ -428,7 +529,7 @@
     <div id="terminal">
 
       <div class="statusbar">
-        <div><span class="dot"></span>AIC // AGENCIA DE INTEGRIDAD DE LA CONSCIENCIA</div>
+        <div><span class="dot"></span>AIC // <span id="statusbar-agent-names">AGENCIA DE INTEGRIDAD DE LA CONSCIENCIA</span></div>
         <div class="statusbar-timer" id="run-timer">⏱ 00:00</div>
         <span>NIVEL_04.EVACUACION_EMERGENCIA</span>
       </div>
@@ -439,10 +540,27 @@
         <p class="subtitle">— Evacuación en Curso —</p>
       </header>
 
+      <div class="progress-wrap">
+        <div class="progress-track" role="img" aria-label="Progreso: nivel 5 de 5">
+          <span class="progress-step is-done"></span>
+          <span class="progress-step is-done"></span>
+          <span class="progress-step is-done"></span>
+          <span class="progress-step is-done"></span>
+          <span class="progress-step is-active"></span>
+        </div>
+        <p class="progress-label">Nivel 5 de 5</p>
+      </div>
+
       <section class="panel intro">
         <p class="panel-label">Mensaje del sistema</p>
-        <p>El sistema reconoció la clave "EL YO ES ILUSIÓN" como una contradicción irresoluble en el núcleo del Juez Cibernético. El colapso lógico resultante ha liberado los anclajes del hangar. Silas Vane está intentando escapar. Hay tres cápsulas en la plataforma de lanzamiento, pero solo tenemos energía para bloquear UNA. Debes identificar cuál contiene la verdadera identidad personal del asesino. ¡Date prisa!</p>
+        <p class="intro-message">El sistema reconoció la clave "EL YO ES ILUSIÓN" como una contradicción irresoluble en el núcleo del Juez Cibernético. El colapso lógico resultante ha liberado los anclajes del hangar. Silas Vane está intentando escapar. Hay tres cápsulas en la plataforma de lanzamiento, pero solo tenemos energía para bloquear UNA. Debes identificar cuál contiene la verdadera identidad personal del asesino. ¡Date prisa!</p>
       </section>
+
+      <div class="begin-wrap" id="begin-wrap">
+        <button class="begin-button" id="btn-begin">Comenzar</button>
+      </div>
+
+      <div id="rest-of-screen">
 
       <section class="panel timer-wrap">
         <p class="timer-label">Anclajes del hangar — colapso total en</p>
@@ -520,8 +638,9 @@
 
       </div>
 
-    </div>
+      </div>
 
+    </div>
     <div class="end-screen" id="screen-fail">
       <h2>MISIÓN FALLIDA</h2>
       <p id="fail-message">TIEMPO AGOTADO. Silas Vane ha escapado al Borde Exterior. Misión fallida.</p>
@@ -531,9 +650,26 @@
     <div class="end-screen" id="screen-success">
       <h2>MISIÓN CUMPLIDA</h2>
       <p>SISTEMA AISLADO. Cápsula 2 asegurada. Has demostrado que la identidad reside en la continuidad ininterrumpida y genuina de la consciencia. Silas Vane ha sido capturado. ¡Misión Cumplida, Agente!</p>
-      <p class="final-time" id="final-time"></p>
+
+      <div class="certificate" id="certificate">
+        <div class="certificate-seal">APROBADO</div>
+        <p class="certificate-heading">Agencia de Integridad de la Consciencia</p>
+        <h3 class="certificate-title">Certificado de Certificación de Campo</h3>
+        <p class="certificate-body">Se certifica que el/los cadete(s)</p>
+        <p class="certificate-names" id="certificate-names">—</p>
+        <p class="certificate-body">completó/completaron exitosamente la simulación A.R.I.S.T.O.T.L.E.S. — Expediente Silas Vane.</p>
+        <div class="certificate-meta">
+          <span id="certificate-time">Tiempo total: —</span>
+          <span id="certificate-date">Fecha: —</span>
+        </div>
+      </div>
+
       <div class="next-tag">// Expediente A.R.I.S.T.O.T.L.E.S. cerrado //</div>
-      <button class="btn-primary btn-restart-mission">Reiniciar Misión</button>
+
+      <div class="end-actions">
+        <button class="btn-primary" id="btn-print">🖨 Imprimir Certificado</button>
+        <button class="btn-primary btn-restart-mission">Reiniciar Misión</button>
+      </div>
     </div>
 
   </div>
@@ -541,6 +677,27 @@
 <script>
 (function(){
   "use strict";
+
+  // ---------- Typewriter effect for the "Mensaje del sistema" panel ----------
+  function typeWriter(el, text, speed, onDone){
+    let i = 0;
+    el.textContent = '';
+    const interval = setInterval(() => {
+      i++;
+      el.textContent = text.slice(0, i);
+      if (i >= text.length){
+        clearInterval(interval);
+        if (onDone) onDone();
+      }
+    }, speed);
+  }
+
+  const introLabelEl = document.querySelector('.intro .panel-label');
+  const introTextEl  = document.querySelector('.intro-message');
+  const beginWrap    = document.getElementById('begin-wrap');
+  const restOfScreen = document.getElementById('rest-of-screen');
+  const btnBegin     = document.getElementById('btn-begin');
+  const TYPE_SPEED = 30; // ms per character
 
   // ---------- Cross-level stopwatch (starts at Level 1, carried forward via ?t0=) ----------
   const runParams = new URLSearchParams(window.location.search);
@@ -560,10 +717,32 @@
   updateRunTimer();
   setInterval(updateRunTimer, 1000);
 
+  // ---------- Agent identification ----------
+  const agentNames = runParams.get('agents');
+  const agentNameEl = document.getElementById('statusbar-agent-names');
+  if (agentNames && agentNameEl){
+    agentNameEl.textContent = 'AGENTE(S): ' + agentNames;
+  }
+
   const nextLevelLink = document.querySelector('.next-tag[href]');
   if (nextLevelLink){
     const baseHref = nextLevelLink.getAttribute('href').split('?')[0];
-    nextLevelLink.setAttribute('href', baseHref + '?t0=' + runStartTime);
+    const forwardParams = new URLSearchParams();
+    forwardParams.set('t0', runStartTime);
+    if (agentNames) forwardParams.set('agents', agentNames);
+    nextLevelLink.setAttribute('href', baseHref + '?' + forwardParams.toString());
+  }
+
+  // ---------- Reload-proof mission deadline (no localStorage: uses the URL itself) ----------
+  function setUrlParam(key, value){
+    const url = new URL(window.location.href);
+    url.searchParams.set(key, value);
+    window.history.replaceState(null, '', url.toString());
+  }
+  function clearUrlParam(key){
+    const url = new URL(window.location.href);
+    url.searchParams.delete(key);
+    window.history.replaceState(null, '', url.toString());
   }
 
   // ---------- Elements ----------
@@ -677,6 +856,7 @@
     gameEnded = true;
     stopTimer();
     disableEverything();
+    clearUrlParam('missionEnd');
     failMessageEl.textContent = FAIL_MESSAGES[reason] || FAIL_MESSAGES.timeout;
     timeoutOverlay.style.display = 'block';
     screenFail.style.display = 'block';
@@ -713,9 +893,17 @@
     gameEnded = true;
     stopTimer();
     disableEverything();
+    clearUrlParam('missionEnd');
 
-    const finalTimeEl = document.getElementById('final-time');
-    if (finalTimeEl) finalTimeEl.textContent = 'Tiempo total de la misión: ' + formatElapsed(Date.now() - runStartTime);
+    const certNamesEl = document.getElementById('certificate-names');
+    const certTimeEl  = document.getElementById('certificate-time');
+    const certDateEl  = document.getElementById('certificate-date');
+    if (certNamesEl) certNamesEl.textContent = agentNames || 'Cadete sin identificar';
+    if (certTimeEl)  certTimeEl.textContent  = 'Tiempo total: ' + formatElapsed(Date.now() - runStartTime);
+    if (certDateEl){
+      const today = new Date();
+      certDateEl.textContent = 'Fecha: ' + today.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+    }
 
     feedback.textContent = 'SISTEMA AISLADO. Cápsula 2 asegurada. Has demostrado que la identidad reside en la continuidad ininterrumpida y genuina de la consciencia. Silas Vane ha sido capturado. ¡Misión Cumplida, Agente!';
     feedback.className = 'feedback success';
@@ -812,6 +1000,7 @@
     terminal.classList.remove('fade-out');
 
     renderTimer();
+    setUrlParam('missionEnd', Date.now() + START_SECONDS * 1000);
     startTimer();
   }
 
@@ -819,8 +1008,53 @@
     btn.addEventListener('click', resetGame);
   });
 
+  const btnPrint = document.getElementById('btn-print');
+  if (btnPrint){
+    btnPrint.addEventListener('click', () => window.print());
+  }
+
+  if (btnBegin){
+    btnBegin.addEventListener('click', () => {
+      if (beginWrap) beginWrap.style.display = 'none';
+      if (restOfScreen) restOfScreen.classList.add('visible');
+      setUrlParam('missionEnd', Date.now() + START_SECONDS * 1000);
+      startTimer(); // the 5-minute countdown only starts once the briefing is dismissed
+    });
+  }
+
   // ---------- Boot ----------
-  startTimer();
+  const existingMissionEnd = runParams.get('missionEnd');
+
+  function skipBriefingUI(){
+    if (introLabelEl) introLabelEl.style.visibility = 'visible';
+    if (introTextEl) introTextEl.style.visibility = 'visible';
+    if (beginWrap) beginWrap.style.display = 'none';
+    if (restOfScreen) restOfScreen.classList.add('visible');
+  }
+
+  if (existingMissionEnd){
+    // Reload during an active mission: resume the real countdown instead of
+    // resetting it to 05:00, based on the deadline stored in the URL itself.
+    const remainingMs = parseInt(existingMissionEnd, 10) - Date.now();
+    skipBriefingUI();
+    if (remainingMs > 0){
+      totalSeconds = Math.ceil(remainingMs / 1000);
+      startTimer();
+    } else {
+      totalSeconds = 0;
+      triggerGameOver('timeout');
+    }
+  } else if (introLabelEl && introTextEl){
+    const labelText = introLabelEl.textContent;
+    const bodyText  = introTextEl.textContent;
+    introLabelEl.style.visibility = 'visible';
+    typeWriter(introLabelEl, labelText, TYPE_SPEED, () => {
+      introTextEl.style.visibility = 'visible';
+      typeWriter(introTextEl, bodyText, TYPE_SPEED, () => {
+        if (beginWrap) beginWrap.classList.add('visible');
+      });
+    });
+  }
 })();
 </script>
 </body>

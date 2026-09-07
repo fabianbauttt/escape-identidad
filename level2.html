@@ -123,6 +123,13 @@
     margin:10px 0 0; text-transform:uppercase;
   }
 
+  .progress-wrap{ text-align:center; margin-bottom:22px; }
+  .progress-track{ display:flex; justify-content:center; gap:6px; margin-bottom:6px; }
+  .progress-step{ width:34px; height:4px; border-radius:2px; background:var(--border); }
+  .progress-step.is-done{ background:var(--lime); box-shadow:0 0 6px var(--lime-dim); }
+  .progress-step.is-active{ background:var(--cyan); box-shadow:0 0 8px var(--cyan-dim); }
+  .progress-label{ font-size:.68rem; letter-spacing:.2em; color:var(--text-dim); text-transform:uppercase; margin:0; }
+
   /* ---------- panel base ---------- */
   .panel{
     background:linear-gradient(180deg, var(--panel-2), var(--panel));
@@ -148,6 +155,47 @@
   .intro p::after{
     content:"█"; color:var(--cyan); animation:pulse-dot 1s steps(2) infinite; margin-left:2px;
   }
+  .intro .panel-label, .intro-message{ visibility:hidden; }
+
+  /* ---------- briefing gate ---------- */
+  #rest-of-screen{ display:none; }
+  #rest-of-screen.visible{ display:block; animation:appear-gate .5s ease; }
+  @keyframes appear-gate{ from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+
+  .begin-wrap{ display:none; justify-content:center; margin:-6px 0 22px; }
+  .begin-wrap.visible{ display:flex; animation:appear-gate .4s ease; }
+  .begin-button{
+    position:relative;
+    padding:16px 40px;
+    background:linear-gradient(180deg, var(--panel-2), var(--panel));
+    border:1px solid var(--cyan);
+    border-radius:4px;
+    color:var(--cyan);
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:.95rem;
+    letter-spacing:.15em;
+    text-transform:uppercase;
+    cursor:pointer;
+    overflow:hidden;
+    box-shadow:0 0 18px var(--cyan-dim), inset 0 0 18px rgba(35,246,255,.06);
+    animation:begin-pulse 2s ease-in-out infinite;
+    transition:transform .12s ease;
+  }
+  @keyframes begin-pulse{
+    0%,100%{ box-shadow:0 0 18px var(--cyan-dim), inset 0 0 18px rgba(35,246,255,.06); }
+    50%{ box-shadow:0 0 30px var(--cyan-dim), inset 0 0 24px rgba(35,246,255,.12); }
+  }
+  .begin-button::before{
+    content:"";
+    position:absolute; top:0; left:-40%; width:35%; height:100%;
+    background:linear-gradient(90deg, transparent, rgba(35,246,255,.4), transparent);
+    animation:begin-sweep 2.4s ease-in-out infinite;
+  }
+  @keyframes begin-sweep{ 0%{left:-40%;} 100%{left:120%;} }
+  .begin-button:hover{ transform:translateY(-2px); }
+  .begin-button:active{ transform:translateY(0) scale(.98); }
+  .begin-button:focus-visible{ outline:2px solid var(--cyan); outline-offset:2px; }
 
   /* ---------- game area (disabled during lockout) ---------- */
   #game-area{ transition:opacity .3s ease, filter .3s ease; }
@@ -361,7 +409,7 @@
     <div id="terminal">
 
       <div class="statusbar">
-        <div><span class="dot"></span>AIC // AGENCIA DE INTEGRIDAD DE LA CONSCIENCIA</div>
+        <div><span class="dot"></span>AIC // <span id="statusbar-agent-names">AGENCIA DE INTEGRIDAD DE LA CONSCIENCIA</span></div>
         <div class="statusbar-timer" id="run-timer">⏱ 00:00</div>
         <span>NIVEL_02.PARADOJA_DE_TESEO</span>
       </div>
@@ -372,10 +420,27 @@
         <p class="subtitle">— Paradoja de Fisión —</p>
       </header>
 
+      <div class="progress-wrap">
+        <div class="progress-track" role="img" aria-label="Progreso: nivel 3 de 5">
+          <span class="progress-step is-done"></span>
+          <span class="progress-step is-done"></span>
+          <span class="progress-step is-active"></span>
+          <span class="progress-step"></span>
+          <span class="progress-step"></span>
+        </div>
+        <p class="progress-label">Nivel 3 de 5</p>
+      </div>
+
       <section class="panel intro">
         <p class="panel-label">Mensaje del sistema</p>
-        <p>El Synth confiesa tener los recuerdos del asesinato, pero su abogado alega que, tras un accidente, TODAS sus piezas mecánicas y chips fueron reemplazados por piezas nuevas. El Juez Cibernético está a punto de declararlo una "entidad nueva y libre de culpa". Tu única opción es construir un silogismo paradójico (Fisión) para colapsar los circuitos lógicos del Juez.</p>
+        <p class="intro-message">El Synth confiesa tener los recuerdos del asesinato, pero su abogado alega que, tras un accidente, TODAS sus piezas mecánicas y chips fueron reemplazados por piezas nuevas. El Juez Cibernético está a punto de declararlo una "entidad nueva y libre de culpa". Tu única opción es construir un silogismo paradójico (Fisión) para colapsar los circuitos lógicos del Juez.</p>
       </section>
+
+      <div class="begin-wrap" id="begin-wrap">
+        <button class="begin-button" id="btn-begin">Comenzar</button>
+      </div>
+
+      <div id="rest-of-screen">
 
       <div id="game-area">
 
@@ -420,6 +485,8 @@
         </div>
       </section>
 
+      </div>
+
     </div>
 
     <div id="level-complete">
@@ -434,6 +501,46 @@
 <script>
 (function(){
   "use strict";
+
+  // ---------- Typewriter effect for the "Mensaje del sistema" panel ----------
+  function typeWriter(el, text, speed, onDone){
+    let i = 0;
+    el.textContent = '';
+    const interval = setInterval(() => {
+      i++;
+      el.textContent = text.slice(0, i);
+      if (i >= text.length){
+        clearInterval(interval);
+        if (onDone) onDone();
+      }
+    }, speed);
+  }
+
+  const introLabelEl = document.querySelector('.intro .panel-label');
+  const introTextEl  = document.querySelector('.intro-message');
+  const beginWrap    = document.getElementById('begin-wrap');
+  const restOfScreen = document.getElementById('rest-of-screen');
+  const btnBegin     = document.getElementById('btn-begin');
+
+  const TYPE_SPEED = 30; // ms per character
+  if (introLabelEl && introTextEl){
+    const labelText = introLabelEl.textContent;
+    const bodyText  = introTextEl.textContent;
+    introLabelEl.style.visibility = 'visible';
+    typeWriter(introLabelEl, labelText, TYPE_SPEED, () => {
+      introTextEl.style.visibility = 'visible';
+      typeWriter(introTextEl, bodyText, TYPE_SPEED, () => {
+        if (beginWrap) beginWrap.classList.add('visible');
+      });
+    });
+  }
+
+  if (btnBegin){
+    btnBegin.addEventListener('click', () => {
+      if (beginWrap) beginWrap.style.display = 'none';
+      if (restOfScreen) restOfScreen.classList.add('visible');
+    });
+  }
 
   // ---------- Cross-level stopwatch (starts at Level 1, carried forward via ?t0=) ----------
   const runParams = new URLSearchParams(window.location.search);
@@ -453,10 +560,20 @@
   updateRunTimer();
   setInterval(updateRunTimer, 1000);
 
+  // ---------- Agent identification (carried forward via ?agents=) ----------
+  const agentNames = runParams.get('agents');
+  const agentNameEl = document.getElementById('statusbar-agent-names');
+  if (agentNames && agentNameEl){
+    agentNameEl.textContent = 'AGENTE(S): ' + agentNames;
+  }
+
   const nextLevelLink = document.querySelector('.next-tag[href]');
   if (nextLevelLink){
     const baseHref = nextLevelLink.getAttribute('href').split('?')[0];
-    nextLevelLink.setAttribute('href', baseHref + '?t0=' + runStartTime);
+    const forwardParams = new URLSearchParams();
+    forwardParams.set('t0', runStartTime);
+    if (agentNames) forwardParams.set('agents', agentNames);
+    nextLevelLink.setAttribute('href', baseHref + '?' + forwardParams.toString());
   }
 
   // ---------- Elements ----------

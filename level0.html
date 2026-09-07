@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>A.I.C. // Nivel 3 — Grietas en la Teoría de Locke</title>
+<title>A.I.C. // Terminal A.R.I.S.T.O.T.L.E.S. — Nivel 0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
@@ -20,7 +20,6 @@
     --lime:#b6ff3c;
     --lime-dim:rgba(182,255,60,.35);
     --amber:#ff9d2e;
-    --amber-dim:rgba(255,157,46,.35);
     --red:#ff3355;
     --text:#cdeff5;
     --text-dim:#5c7883;
@@ -82,10 +81,6 @@
     padding:9px 14px; border-radius:3px; margin-bottom:22px;
     text-transform:uppercase;
   }
-  .statusbar-timer{
-    font-family:var(--font-mono); color:var(--cyan); letter-spacing:.1em;
-    text-shadow:0 0 6px var(--cyan-dim);
-  }
   .statusbar .dot{
     display:inline-block; width:7px; height:7px; border-radius:50%;
     background:var(--lime); margin-right:7px; box-shadow:0 0 8px var(--lime);
@@ -103,12 +98,13 @@
   h1.glitch{
     font-family:var(--font-display);
     font-weight:900;
-    font-size:clamp(1.7rem, 5.6vw, 3rem);
+    font-size:clamp(1.9rem, 6vw, 3.4rem);
     margin:0;
     color:var(--cyan);
-    letter-spacing:.05em;
+    letter-spacing:.06em;
     text-shadow:0 0 10px var(--cyan-dim), 0 0 26px var(--cyan-dim);
     animation:glitch-flicker 7s infinite;
+    position:relative;
   }
   @keyframes glitch-flicker{
     0%,88%,100%{ text-shadow:0 0 10px var(--cyan-dim), 0 0 26px var(--cyan-dim); transform:translate(0,0); }
@@ -196,19 +192,15 @@
   .begin-button:active{ transform:translateY(0) scale(.98); }
   .begin-button:focus-visible{ outline:2px solid var(--cyan); outline-offset:2px; }
 
-  /* ---------- classification area (disabled once confirmed) ---------- */
-  #classification-area{ transition:opacity .3s ease, filter .3s ease; }
-  #classification-area.locked-out{ opacity:.45; filter:grayscale(.5); pointer-events:none; }
-
   /* ---------- card pool ---------- */
   #card-pool{
     display:grid;
-    grid-template-columns:repeat(auto-fill, minmax(210px,1fr));
+    grid-template-columns:repeat(auto-fill, minmax(160px,1fr));
     gap:12px;
     min-height:64px;
   }
   #card-pool:empty::after{
-    content:"— sin fragmentos pendientes —";
+    content:"— sin expedientes pendientes —";
     grid-column:1/-1; text-align:center; color:var(--text-dim); font-size:.8rem; padding:14px 0;
   }
 
@@ -219,7 +211,7 @@
     border-radius:3px;
     padding:12px 12px;
     cursor:grab;
-    font-size:.8rem;
+    font-size:.82rem;
     line-height:1.45;
     color:var(--text);
     user-select:none;
@@ -235,6 +227,7 @@
     display:grid;
     grid-template-columns:1fr 1fr;
     gap:16px;
+    margin-bottom:22px;
   }
   .zone{
     border-radius:4px; padding:14px;
@@ -242,14 +235,14 @@
     border:1px solid var(--border);
     transition:border-color .15s ease, box-shadow .15s ease;
   }
-  .zone--reid{ border-top:2px solid var(--cyan); }
-  .zone--hume{ border-top:2px solid var(--magenta); }
+  .zone--critical{ border-top:2px solid var(--magenta); }
+  .zone--accidental{ border-top:2px solid var(--cyan); }
   .zone h3{
-    margin:0 0 10px; font-size:.76rem; letter-spacing:.05em; text-transform:uppercase;
+    margin:0 0 10px; font-size:.78rem; letter-spacing:.06em; text-transform:uppercase;
     font-family:var(--font-display); font-weight:700;
   }
-  .zone--reid h3{ color:var(--cyan); }
-  .zone--hume h3{ color:var(--magenta); }
+  .zone--critical h3{ color:var(--magenta); }
+  .zone--accidental h3{ color:var(--cyan); }
 
   .zone__body{
     min-height:110px;
@@ -263,130 +256,78 @@
     color:var(--text-dim); font-size:.75rem; text-align:center;
     margin:auto; padding:10px;
   }
-  .zone__body.drag-over{ border-style:solid; }
-  .zone--reid .zone__body.drag-over{ border-color:var(--cyan); box-shadow:inset 0 0 16px var(--cyan-dim); }
-  .zone--hume .zone__body.drag-over{ border-color:var(--magenta); box-shadow:inset 0 0 16px var(--magenta-dim); }
-
-  .zone--reid .card{ border-left-color:var(--cyan); }
-  .zone--hume .card{ border-left-color:var(--magenta); }
-
-  /* ---------- Step 2: decode module ---------- */
-  .decode-panel{
-    display:none;
-    border:1px solid var(--cyan);
-    box-shadow:0 0 22px var(--cyan-dim), inset 0 0 26px rgba(35,246,255,.03);
+  .zone__body.drag-over{
+    border-style:solid;
   }
-  .decode-panel.visible{ display:block; animation:appear .5s ease; }
-  .decode-panel::before{
-    background:linear-gradient(90deg, var(--cyan), var(--magenta));
-    box-shadow:0 0 10px var(--cyan-dim);
-  }
-  .decode-title{
-    font-family:var(--font-display); font-weight:900; letter-spacing:.08em; text-transform:uppercase;
-    font-size:1.05rem; margin:2px 0 10px;
-    background:linear-gradient(90deg, var(--cyan), var(--magenta));
-    -webkit-background-clip:text; background-clip:text; color:transparent;
-  }
-  .decode-hint{ font-size:.85rem; line-height:1.6; color:var(--text); margin:0 0 16px; }
-  .decode-hint strong{ color:var(--amber); }
+  .zone--critical .zone__body.drag-over{ border-color:var(--magenta); box-shadow:inset 0 0 16px var(--magenta-dim); }
+  .zone--accidental .zone__body.drag-over{ border-color:var(--cyan); box-shadow:inset 0 0 16px var(--cyan-dim); }
 
-  .cipher-screen{
+  .zone--critical .card{ border-left-color:var(--magenta); }
+  .zone--accidental .card{ border-left-color:var(--cyan); }
+
+  /* ---------- keypad ---------- */
+  .keypad-instructions{
+    font-size:.88rem; color:var(--text); line-height:1.6; margin:0 0 16px;
+  }
+  .keypad-instructions .essence{ color:var(--magenta); font-weight:bold; }
+
+  .keypad-wrap{
+    display:flex; flex-direction:column; align-items:center; gap:16px;
+  }
+
+  .screen{
+    width:100%; max-width:260px;
     background:#010202;
     border:1px solid var(--border);
     border-radius:4px;
-    padding:16px;
+    padding:14px;
     text-align:center;
-    margin-bottom:18px;
     box-shadow:inset 0 0 20px rgba(35,246,255,.08);
   }
-  .cipher-screen__text{
+  .screen__digits{
     font-family:var(--font-display);
-    font-size:clamp(1.1rem, 4vw, 1.5rem);
-    letter-spacing:.3em;
+    font-size:2rem;
+    letter-spacing:.4em;
     color:var(--cyan);
     text-shadow:0 0 10px var(--cyan-dim);
-    word-break:break-word;
+    min-height:2.4rem;
   }
 
-  .decode-form{ display:flex; flex-direction:column; align-items:center; gap:14px; }
-  .decode-input{
-    width:100%; max-width:420px;
-    background:var(--void);
+  .keypad{
+    display:grid;
+    grid-template-columns:repeat(3, 64px);
+    gap:10px;
+  }
+  .key{
+    width:64px; height:56px;
+    background:var(--panel);
     border:1px solid var(--border);
     border-radius:4px;
-    padding:12px 14px;
     color:var(--text);
-    font-family:var(--font-mono);
-    font-size:.95rem;
-    letter-spacing:.05em;
-    text-transform:uppercase;
-    text-align:center;
-  }
-  .decode-input:focus{ outline:none; border-color:var(--cyan); box-shadow:0 0 14px var(--cyan-dim); }
-  .decode-input::placeholder{ color:var(--text-dim); text-transform:none; letter-spacing:normal; }
-
-  /* ---------- buttons ---------- */
-  .classify-button, .decode-button{
-    position:relative;
-    display:block;
-    width:100%;
-    max-width:540px;
-    margin:0 auto;
-    padding:20px 24px;
-    background:linear-gradient(180deg, var(--panel-2), var(--panel));
-    border-radius:4px;
     font-family:var(--font-display);
-    font-weight:700;
-    font-size:1rem;
-    letter-spacing:.12em;
-    text-transform:uppercase;
+    font-size:1.05rem;
     cursor:pointer;
-    overflow:hidden;
-    transition:transform .12s ease;
+    transition:transform .08s ease, box-shadow .12s ease, border-color .12s ease;
   }
-  .classify-button::before, .decode-button::before{
-    content:"";
-    position:absolute; top:0; left:-40%; width:35%; height:100%;
-    animation:scan-sweep 2.6s ease-in-out infinite;
-  }
-  @keyframes scan-sweep{ 0%{left:-40%;} 100%{left:120%;} }
-  .classify-button:hover, .decode-button:hover{ transform:translateY(-2px); }
-  .classify-button:active, .decode-button:active{ transform:translateY(0) scale(.98); }
-  .classify-button:disabled, .decode-button:disabled{ opacity:.35; cursor:not-allowed; animation:none; transform:none; }
-  .classify-button:disabled::before, .decode-button:disabled::before{ display:none; }
-  .classify-button.hidden{ display:none; }
-
-  .classify-button{
-    border:1px solid var(--magenta);
-    color:var(--magenta);
-    box-shadow:0 0 18px var(--magenta-dim), inset 0 0 18px rgba(255,46,166,.06);
-    animation:classify-pulse 2.2s ease-in-out infinite;
-  }
-  .classify-button::before{ background:linear-gradient(90deg, transparent, rgba(255,46,166,.4), transparent); }
-  @keyframes classify-pulse{
-    0%,100%{ box-shadow:0 0 18px var(--magenta-dim), inset 0 0 18px rgba(255,46,166,.06); }
-    50%{ box-shadow:0 0 30px var(--magenta-dim), inset 0 0 24px rgba(255,46,166,.12); }
-  }
-
-  .decode-button{
-    border:1px solid var(--cyan);
-    color:var(--cyan);
-    box-shadow:0 0 18px var(--cyan-dim), inset 0 0 18px rgba(35,246,255,.06);
-  }
-  .decode-button::before{ background:linear-gradient(90deg, transparent, rgba(35,246,255,.35), transparent); }
-  .decode-button:hover{ box-shadow:0 0 30px var(--cyan-dim), inset 0 0 24px rgba(35,246,255,.12); }
+  .key:hover{ border-color:var(--cyan); box-shadow:0 0 10px var(--cyan-dim); }
+  .key:active{ transform:scale(.93); }
+  .key--clear{ color:var(--red); border-color:var(--border); font-size:.72rem; letter-spacing:.05em; }
+  .key--clear:hover{ border-color:var(--red); box-shadow:0 0 10px rgba(255,51,85,.35); }
+  .key--enter{ color:var(--lime); font-size:.72rem; letter-spacing:.05em; }
+  .key--enter:hover{ border-color:var(--lime); box-shadow:0 0 10px var(--lime-dim); }
+  .key:disabled{ opacity:.3; cursor:not-allowed; transform:none; box-shadow:none; }
 
   .feedback{
     min-height:1.4rem;
-    max-width:580px;
+    max-width:520px;
     text-align:center;
     font-size:.85rem;
     line-height:1.6;
     font-weight:bold;
     letter-spacing:.02em;
-    margin:0 auto;
   }
   .feedback.error{ color:var(--red); animation:flash-error .35s steps(1) 4; }
+  .feedback.inconsistency{ color:var(--amber); text-shadow:0 0 8px rgba(255,157,46,.4); animation:flash-error .35s steps(1) 4; }
   .feedback.success{ color:var(--lime); text-shadow:0 0 10px var(--lime-dim); }
   @keyframes flash-error{ 0%,100%{opacity:1;} 50%{opacity:.2;} }
 
@@ -398,16 +339,10 @@
     40%,60%{ transform:translateX(4px); }
   }
 
-  body.success-flash::before{
-    content:"";
-    position:fixed; inset:0; z-index:16; pointer-events:none;
-    background:radial-gradient(circle, rgba(182,255,60,.9), rgba(35,246,255,.55));
-    animation:success-flash-anim 1s ease-out forwards;
-  }
-  @keyframes success-flash-anim{ 0%{opacity:0;} 12%{opacity:.95;} 100%{opacity:0;} }
-
   /* ---------- terminal wrapper transition ---------- */
-  #terminal.fade-out{ animation:fade-out-terminal .6s ease forwards; }
+  #terminal.fade-out{
+    animation:fade-out-terminal .6s ease forwards;
+  }
   @keyframes fade-out-terminal{
     to{ opacity:0; transform:scale(.98); filter:blur(4px); }
   }
@@ -448,11 +383,13 @@
   /* ---------- responsive ---------- */
   @media (max-width:640px){
     .zones{ grid-template-columns:1fr; }
+    .keypad{ grid-template-columns:repeat(3, 1fr); max-width:260px; width:100%; }
+    .key{ width:100%; }
     .statusbar{ flex-direction:column; gap:4px; align-items:flex-start; }
   }
 
   /* ---------- focus visibility ---------- */
-  .classify-button:focus-visible, .decode-button:focus-visible, .restart-link:focus-visible, .decode-input:focus-visible{
+  .key:focus-visible, .restart-link:focus-visible{
     outline:2px solid var(--cyan); outline-offset:2px;
   }
 
@@ -473,30 +410,29 @@
 
       <div class="statusbar">
         <div><span class="dot"></span>AIC // <span id="statusbar-agent-names">AGENCIA DE INTEGRIDAD DE LA CONSCIENCIA</span></div>
-        <div class="statusbar-timer" id="run-timer">⏱ 00:00</div>
-        <span>NIVEL_03.CRITICAS_A_LOCKE</span>
+        <span>NIVEL_00.CALIBRACION</span>
       </div>
 
       <header>
-        <p class="eyebrow">Protocolo de contradicción lógica</p>
-        <h1 class="glitch">Grietas en la Teoría de Locke</h1>
-        <p class="subtitle">— Reid y Hume contra la Memoria —</p>
+        <p class="eyebrow">Expediente clasificado · Silas Vane</p>
+        <h1 class="glitch">Terminal A.R.I.S.T.O.T.L.E.S.</h1>
+        <p class="subtitle">— Calibración Inicial —</p>
       </header>
 
       <div class="progress-wrap">
-        <div class="progress-track" role="img" aria-label="Progreso: nivel 4 de 5">
-          <span class="progress-step is-done"></span>
-          <span class="progress-step is-done"></span>
-          <span class="progress-step is-done"></span>
+        <div class="progress-track" role="img" aria-label="Progreso: nivel 1 de 5">
           <span class="progress-step is-active"></span>
           <span class="progress-step"></span>
+          <span class="progress-step"></span>
+          <span class="progress-step"></span>
+          <span class="progress-step"></span>
         </div>
-        <p class="progress-label">Nivel 4 de 5</p>
+        <p class="progress-label">Nivel 1 de 5</p>
       </div>
 
       <section class="panel intro">
         <p class="panel-label">Mensaje del sistema</p>
-        <p class="intro-message">El Juez Cibernético sigue aferrado al criterio de Locke: identidad = continuidad de la memoria. Pero dos siglos de filosofía ya encontraron sus fisuras. Recupera los argumentos de Thomas Reid y David Hume, clasifícalos correctamente, y decodifica la clave final que colapsará su lógica.</p>
+        <p class="intro-message">Bienvenido, Cadete. Para acceder al expediente del criminal Silas Vane, debes calibrar el escáner identificando qué cambios destruyen la identidad fundamental del sujeto (Propiedad Esencial) y qué cambios son superficiales (Propiedad Accidental).</p>
       </section>
 
       <div class="begin-wrap" id="begin-wrap">
@@ -505,54 +441,50 @@
 
       <div id="rest-of-screen">
 
-      <div id="classification-area">
-
-        <section class="panel">
-          <p class="panel-label">Fragmentos de argumentación filosófica</p>
-          <div id="card-pool">
-            <div class="card" id="card-a" draggable="true"><b>[A]</b> El general recuerda ser el oficial, pero no recuerda haber sido azotado de niño.</div>
-            <div class="card" id="card-b" draggable="true"><b>[B]</b> Si A=B y B=C, entonces A=C — pero la memoria de Locke viola esta transitividad.</div>
-            <div class="card" id="card-c" draggable="true"><b>[C]</b> Al introspeccionar, solo encontramos percepciones sueltas: nunca un "yo" que las una.</div>
-            <div class="card" id="card-d" draggable="true"><b>[D]</b> La identidad personal es una ficción útil que la mente inventa por costumbre, no una sustancia real.</div>
-            <div class="card" id="card-e" draggable="true"><b>[E]</b> La identidad reside en la continuidad psicológica de la consciencia.</div>
-            <div class="card" id="card-f" draggable="true"><b>[F]</b> Un androide puede ser reprogramado sin perder su garantía de fábrica.</div>
-          </div>
-        </section>
-
-        <section class="panel">
-          <div class="zones">
-            <div class="zone zone--reid">
-              <h3>Crítica de Reid (Paradoja del Oficial Valiente)</h3>
-              <div class="zone__body" id="zone-reid-body" data-placeholder="Arrastra aquí los argumentos de Reid"></div>
-            </div>
-            <div class="zone zone--hume">
-              <h3>Crítica de Hume (Teoría del Haz)</h3>
-              <div class="zone__body" id="zone-hume-body" data-placeholder="Arrastra aquí los argumentos de Hume"></div>
-            </div>
-          </div>
-        </section>
-
-      </div>
-
-      <section class="panel decode-panel" id="decode-module">
-        <p class="panel-label">Núcleo de verificación</p>
-        <h3 class="decode-title">Módulo de Descifrado</h3>
-        <p class="decode-hint">El núcleo del Juez exige una clave final. Protocolo de cifrado detectado: <strong>CÉSAR — desplazamiento +3</strong>.</p>
-
-        <div class="cipher-screen">
-          <div class="cipher-screen__text">HO BR HV LOXVLRQ</div>
-        </div>
-
-        <div class="decode-form">
-          <input type="text" class="decode-input" id="decode-input" placeholder="Escribe la frase descifrada..." autocomplete="off">
-          <button class="decode-button" id="btn-decode">Confirmar Descifrado</button>
+      <section class="panel">
+        <p class="panel-label">Expediente · Modificaciones del Agente K</p>
+        <div id="card-pool">
+          <div class="card" id="card-1" draggable="true"><b>(1)</b> Ojos robóticos rojos.</div>
+          <div class="card" id="card-2" draggable="true"><b>(2)</b> Pierna cibernética.</div>
+          <div class="card" id="card-3" draggable="true"><b>(3)</b> Alteración total del código genético humano.</div>
+          <div class="card" id="card-4" draggable="true"><b>(4)</b> Cambio de nombre legal.</div>
+          <div class="card" id="card-5" draggable="true"><b>(5)</b> Extracción de su consciencia y razonamiento.</div>
         </div>
       </section>
 
+      <div class="zones">
+        <div class="zone zone--critical">
+          <h3>Fallas Críticas (Cambio a la Esencia)</h3>
+          <div class="zone__body" id="zone-a-body" data-placeholder="Arrastra aquí las modificaciones esenciales"></div>
+        </div>
+        <div class="zone zone--accidental">
+          <h3>Modificación Aceptable (Cambio Accidental)</h3>
+          <div class="zone__body" id="zone-b-body" data-placeholder="Arrastra aquí las modificaciones accidentales"></div>
+        </div>
+      </div>
+
       <section class="panel">
         <p class="panel-label">Módulo de validación</p>
-        <div class="decode-form">
-          <button class="classify-button" id="btn-classify">Confirmar Clasificación Filosófica</button>
+        <p class="keypad-instructions">Ingrese el código de 2 dígitos correspondiente a las modificaciones que alteran la <span class="essence">ESENCIA</span> del individuo:</p>
+
+        <div class="keypad-wrap">
+          <div class="screen"><div class="screen__digits" id="screen-digits">__</div></div>
+
+          <div class="keypad" id="keypad">
+            <button class="key" data-digit="1">1</button>
+            <button class="key" data-digit="2">2</button>
+            <button class="key" data-digit="3">3</button>
+            <button class="key" data-digit="4">4</button>
+            <button class="key" data-digit="5">5</button>
+            <button class="key" data-digit="6">6</button>
+            <button class="key" data-digit="7">7</button>
+            <button class="key" data-digit="8">8</button>
+            <button class="key" data-digit="9">9</button>
+            <button class="key key--clear" id="btn-clear">CLEAR</button>
+            <button class="key" data-digit="0">0</button>
+            <button class="key key--enter" id="btn-enter">ENTER</button>
+          </div>
+
           <div class="feedback" id="feedback" role="status" aria-live="polite"></div>
         </div>
       </section>
@@ -562,10 +494,10 @@
     </div>
 
     <div id="level-complete">
-      <h2>GRIETA CONFIRMADA</h2>
-      <p>CLAVE ACEPTADA: "EL YO ES ILUSIÓN". Contradicción confirmada en el núcleo del Juez Cibernético. Sistema desestabilizado. Los anclajes del hangar comienzan a fallar...</p>
-      <a class="next-tag" href="level4.html">Continuar → Nivel 4</a>
-      <button class="restart-link" id="btn-restart">↺ Reiniciar módulo</button>
+      <h2>ACCESO CONCEDIDO</h2>
+      <p>CALIBRACIÓN EXITOSA. Escáner sincronizado. Accediendo a los servidores centrales del expediente Silas Vane...</p>
+      <a class="next-tag" href="level1.html">Continuar → Nivel 1</a>
+      <button class="restart-link" id="btn-restart">↺ Reiniciar calibración</button>
     </div>
 
   </div>
@@ -614,85 +546,30 @@
     });
   }
 
-  // ---------- Cross-level stopwatch (starts at Level 1, carried forward via ?t0=) ----------
-  const runParams = new URLSearchParams(window.location.search);
-  const runStartTime = runParams.get('t0') ? parseInt(runParams.get('t0'), 10) : Date.now();
-  const runTimerEl = document.getElementById('run-timer');
-
-  function formatElapsed(ms){
-    const totalSeconds = Math.floor(ms / 1000);
-    const m = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
-    const s = (totalSeconds % 60).toString().padStart(2, '0');
-    return `${m}:${s}`;
-  }
-
-  function updateRunTimer(){
-    if (runTimerEl) runTimerEl.textContent = '⏱ ' + formatElapsed(Date.now() - runStartTime);
-  }
-  updateRunTimer();
-  setInterval(updateRunTimer, 1000);
-
   // ---------- Agent identification (carried forward via ?agents=) ----------
-  const agentNames = runParams.get('agents');
+  const identityParams = new URLSearchParams(window.location.search);
+  const agentNames = identityParams.get('agents');
   const agentNameEl = document.getElementById('statusbar-agent-names');
   if (agentNames && agentNameEl){
     agentNameEl.textContent = 'AGENTE(S): ' + agentNames;
   }
 
   const nextLevelLink = document.querySelector('.next-tag[href]');
-  if (nextLevelLink){
+  if (nextLevelLink && agentNames){
     const baseHref = nextLevelLink.getAttribute('href').split('?')[0];
-    const forwardParams = new URLSearchParams();
-    forwardParams.set('t0', runStartTime);
-    if (agentNames) forwardParams.set('agents', agentNames);
-    nextLevelLink.setAttribute('href', baseHref + '?' + forwardParams.toString());
-  }
-
-  // ---------- Elements ----------
-  const terminal    = document.getElementById('terminal');
-  const classArea    = document.getElementById('classification-area');
-  const pool         = document.getElementById('card-pool');
-  const zoneReid     = document.getElementById('zone-reid-body');
-  const zoneHume     = document.getElementById('zone-hume-body');
-  const dropContainers = [pool, zoneReid, zoneHume];
-
-  const classifyButton = document.getElementById('btn-classify');
-  const classifyPanel  = classifyButton.closest('.panel');
-  const feedback       = document.getElementById('feedback');
-
-  const decodeModule = document.getElementById('decode-module');
-  const decodeInput  = document.getElementById('decode-input');
-  const decodeButton = document.getElementById('btn-decode');
-
-  // ---------- State ----------
-  let step1Locked = false; // true once the classification has been confirmed correct
-  let gameEnded   = false; // true once the cipher has been solved (final win)
-  let suppressClick = false;
-
-  const ANSWER = 'EL YO ES ILUSION';
-
-  function normalize(str){
-    return str
-      .toUpperCase()
-      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-      .replace(/\s+/g, ' ')
-      .trim();
-  }
-
-  function clearFeedback(){
-    feedback.textContent = '';
-    feedback.className = 'feedback';
-  }
-
-  function shakeElement(el){
-    el.classList.add('shake');
-    setTimeout(() => el.classList.remove('shake'), 400);
+    nextLevelLink.setAttribute('href', baseHref + '?agents=' + encodeURIComponent(agentNames));
   }
 
   // ---------- Drag & Drop ----------
+  const pool   = document.getElementById('card-pool');
+  const zoneA  = document.getElementById('zone-a-body');
+  const zoneB  = document.getElementById('zone-b-body');
+  const dropContainers = [pool, zoneA, zoneB];
+
+  let suppressClick = false;
+
   document.querySelectorAll('.card').forEach(card => {
     card.addEventListener('dragstart', (e) => {
-      if (step1Locked) { e.preventDefault(); return; }
       suppressClick = true;
       e.dataTransfer.setData('text/plain', card.id);
       e.dataTransfer.effectAllowed = 'move';
@@ -702,11 +579,10 @@
       card.classList.remove('dragging');
       setTimeout(() => { suppressClick = false; }, 50);
     });
-    // Click / touch fallback: cycles Pool -> Reid -> Hume -> Pool
+    // Click / touch fallback: cycles Pool -> Zone A -> Zone B -> Pool
     card.addEventListener('click', () => {
-      if (step1Locked) return;
       if (suppressClick) { suppressClick = false; return; }
-      const order = [pool, zoneReid, zoneHume];
+      const order = [pool, zoneA, zoneB];
       const currentIndex = order.indexOf(card.parentElement);
       const nextIndex = (currentIndex + 1) % order.length;
       order[nextIndex].appendChild(card);
@@ -715,7 +591,6 @@
 
   dropContainers.forEach(zone => {
     zone.addEventListener('dragover', (e) => {
-      if (step1Locked) return;
       e.preventDefault();
       e.dataTransfer.dropEffect = 'move';
       zone.classList.add('drag-over');
@@ -724,125 +599,138 @@
     zone.addEventListener('drop', (e) => {
       e.preventDefault();
       zone.classList.remove('drag-over');
-      if (step1Locked) return;
       const id = e.dataTransfer.getData('text/plain');
       const card = document.getElementById(id);
       if (card) zone.appendChild(card);
     });
   });
 
-  // ---------- Step 1: philosophical classification ----------
-  const REID_CORRECT   = ['card-a', 'card-b'];
-  const HUME_CORRECT   = ['card-c', 'card-d'];
-  const DISTRACTOR_IDS = ['card-e', 'card-f'];
+  // ---------- Keypad ----------
+  const screenDigits = document.getElementById('screen-digits');
+  const feedback = document.getElementById('feedback');
+  const keypad = document.getElementById('keypad');
+  const keypadPanel = keypad.closest('.panel');
+  const CORRECT_CODE = '35';
+  const CORRECT_CODE_REVERSED = '53';
+  const CORRECT_ZONE_A_IDS = ['card-3', 'card-5'];
+  const MAX_LEN = 2;
+  let inputCode = '';
+  let locked = false;
 
-  function idsMatchExactly(container, expectedIds){
-    const idsPresent = Array.from(container.children).map(card => card.id);
-    return idsPresent.length === expectedIds.length &&
-           expectedIds.every(id => idsPresent.includes(id));
+  function renderScreen(){
+    const padded = inputCode.padEnd(MAX_LEN, '_').split('').join(' ');
+    screenDigits.textContent = padded;
   }
 
-  function isSortedCorrectly(){
-    const reidOk = idsMatchExactly(zoneReid, REID_CORRECT);
-    const humeOk = idsMatchExactly(zoneHume, HUME_CORRECT);
-    const distractorsOut = DISTRACTOR_IDS.every(id => {
-      const card = document.getElementById(id);
-      return card.parentElement !== zoneReid && card.parentElement !== zoneHume;
-    });
-    return reidOk && humeOk && distractorsOut;
+  function clearFeedback(){
+    feedback.textContent = '';
+    feedback.className = 'feedback';
   }
 
-  function advanceToDecodeStep(){
-    step1Locked = true;
+  function pressDigit(d){
+    if (locked) return;
+    if (inputCode.length >= MAX_LEN) return;
+    inputCode += d;
+    renderScreen();
+  }
+
+  function clearInput(){
+    if (locked) return;
+    inputCode = '';
+    renderScreen();
     clearFeedback();
-    classArea.classList.add('locked-out');
-    classifyButton.classList.add('hidden');
-    decodeModule.classList.add('visible');
-    decodeInput.focus();
   }
 
-  classifyButton.addEventListener('click', () => {
-    if (step1Locked) return;
-    if (isSortedCorrectly()){
-      advanceToDecodeStep();
-    } else {
-      feedback.textContent = 'ERROR DE CLASIFICACIÓN. Ni Reid ni Hume aceptarían esa asignación. Revisa qué argumento pertenece a la paradoja del oficial valiente y cuál a la teoría del haz.';
-      feedback.className = 'feedback error';
-      shakeElement(classifyPanel);
-    }
-  });
+  function isZoneASortedCorrectly(){
+    const idsInZoneA = Array.from(zoneA.children).map(card => card.id);
+    return idsInZoneA.length === CORRECT_ZONE_A_IDS.length &&
+           CORRECT_ZONE_A_IDS.every(id => idsInZoneA.includes(id));
+  }
 
-  // ---------- Step 2: Caesar cipher ----------
+  function onFail(){
+    feedback.textContent = "ACCESO DENEGADO. Revisa tus definiciones de 'Accidente' vs 'Esencia'. Un cambio de piezas no es un cambio de identidad.";
+    feedback.className = 'feedback error';
+    keypadPanel.classList.add('shake');
+    setTimeout(() => keypadPanel.classList.remove('shake'), 400);
+    setTimeout(() => {
+      inputCode = '';
+      renderScreen();
+      clearFeedback();
+    }, 2600);
+  }
+
+  function onInconsistency(){
+    feedback.textContent = 'INCONSISTENCIA: Código aceptado, pero la clasificación visual del escáner no coincide. Reordena los expedientes.';
+    feedback.className = 'feedback inconsistency';
+    keypadPanel.classList.add('shake');
+    setTimeout(() => keypadPanel.classList.remove('shake'), 400);
+    setTimeout(() => {
+      inputCode = '';
+      renderScreen();
+      clearFeedback();
+    }, 3000);
+  }
+
   function onSuccess(){
-    gameEnded = true;
-    decodeButton.disabled = true;
-    decodeInput.disabled = true;
-
-    feedback.textContent = 'CLAVE ACEPTADA: "EL YO ES ILUSIÓN". Contradicción confirmada en el núcleo del Juez Cibernético. Sistema desestabilizado. Los anclajes del hangar comienzan a fallar...';
+    locked = true;
+    feedback.textContent = 'CALIBRACIÓN EXITOSA. Escáner sincronizado. Accediendo a los servidores centrales...';
     feedback.className = 'feedback success';
-
-    document.body.classList.add('success-flash');
-    setTimeout(() => document.body.classList.remove('success-flash'), 1100);
+    keypad.querySelectorAll('.key').forEach(k => k.disabled = true);
 
     setTimeout(() => {
+      const terminal = document.getElementById('terminal');
       terminal.classList.add('fade-out');
       setTimeout(() => {
         terminal.style.display = 'none';
         document.getElementById('level-complete').style.display = 'block';
       }, 600);
-    }, 2200);
+    }, 1600);
   }
 
-  function attemptDecode(){
-    if (gameEnded || !step1Locked) return;
-    const raw = decodeInput.value;
-    if (!raw.trim()){
-      feedback.textContent = 'ESCRIBE LA FRASE DESCIFRADA ANTES DE CONFIRMAR.';
-      feedback.className = 'feedback error';
-      shakeElement(decodeModule);
-      return;
-    }
-    if (normalize(raw) === normalize(ANSWER)){
-      onSuccess();
-    } else {
-      feedback.textContent = 'DESCIFRADO INCORRECTO. Revisa el desplazamiento (+3) y vuelve a intentarlo.';
-      feedback.className = 'feedback error';
-      shakeElement(decodeModule);
-    }
+  function enterCode(){
+    if (locked) return;
+    if (inputCode.length < MAX_LEN) return;
+
+    const codeIsCorrect = (inputCode === CORRECT_CODE || inputCode === CORRECT_CODE_REVERSED);
+    if (!codeIsCorrect) return onFail();
+
+    if (!isZoneASortedCorrectly()) return onInconsistency();
+
+    onSuccess();
   }
 
-  decodeButton.addEventListener('click', attemptDecode);
-  decodeInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') attemptDecode();
+  keypad.addEventListener('click', (e) => {
+    const btn = e.target.closest('.key');
+    if (!btn) return;
+    if (btn.id === 'btn-clear') return clearInput();
+    if (btn.id === 'btn-enter') return enterCode();
+    if (btn.dataset.digit !== undefined) return pressDigit(btn.dataset.digit);
   });
-  decodeInput.addEventListener('input', () => {
-    if (!gameEnded) clearFeedback();
+
+  // Physical keyboard support
+  document.addEventListener('keydown', (e) => {
+    if (locked) return;
+    if (/^[0-9]$/.test(e.key)) pressDigit(e.key);
+    else if (e.key === 'Enter') enterCode();
+    else if (e.key === 'Backspace' || e.key === 'Escape') clearInput();
   });
 
   // ---------- Restart (for testing) ----------
   document.getElementById('btn-restart').addEventListener('click', () => {
     document.querySelectorAll('.card').forEach(card => pool.appendChild(card));
-
-    step1Locked = false;
-    gameEnded = false;
-
-    classArea.classList.remove('locked-out');
-    classifyButton.classList.remove('hidden');
-    classifyButton.disabled = false;
-
-    decodeModule.classList.remove('visible');
-    decodeInput.value = '';
-    decodeInput.disabled = false;
-    decodeButton.disabled = false;
-
+    inputCode = '';
+    locked = false;
+    renderScreen();
     clearFeedback();
-    document.body.classList.remove('success-flash');
+    keypad.querySelectorAll('.key').forEach(k => k.disabled = false);
 
+    const terminal = document.getElementById('terminal');
     terminal.style.display = 'block';
     terminal.classList.remove('fade-out');
     document.getElementById('level-complete').style.display = 'none';
   });
 
+  renderScreen();
 })();
 </script>
 </body>
