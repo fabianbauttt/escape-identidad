@@ -537,7 +537,7 @@
       <section class="panel decode-panel" id="decode-module">
         <p class="panel-label">Núcleo de verificación</p>
         <h3 class="decode-title">Módulo de Descifrado</h3>
-        <p class="decode-hint">El núcleo del Juez exige una clave final. Protocolo de cifrado detectado: <strong>CÉSAR — desplazamiento +3</strong>.</p>
+        <p class="decode-hint">El núcleo del Juez exige una clave final. Protocolo de cifrado detectado: <strong>CÉSAR</strong>.</p>
 
         <div class="cipher-screen">
           <div class="cipher-screen__text">HO BR HV LOXVLRQ</div>
@@ -563,7 +563,7 @@
 
     <div id="level-complete">
       <h2>GRIETA CONFIRMADA</h2>
-      <p>CLAVE ACEPTADA: "EL YO ES ILUSIÓN". Contradicción confirmada en el núcleo del Juez Cibernético. Sistema desestabilizado. Los anclajes del hangar comienzan a fallar...</p>
+      <p>CLAVE ACEPTADA: "FM ZP FT JMVTJPO". Verificación de doble capa superada. El mensaje real, "EL YO ES ILUSIÓN", ha sido inyectado en el núcleo del Juez Cibernético. Sistema desestabilizado. Los anclajes del hangar comienzan a fallar...</p>
       <a class="next-tag" href="level4.html">Continuar → Nivel 4</a>
       <button class="restart-link" id="btn-restart">↺ Reiniciar módulo</button>
     </div>
@@ -669,7 +669,7 @@
   let gameEnded   = false; // true once the cipher has been solved (final win)
   let suppressClick = false;
 
-  const ANSWER = 'EL YO ES ILUSION';
+  const ANSWER = 'FM ZP FT JMVTJPO';
 
   function normalize(str){
     return str
@@ -778,7 +778,7 @@
     decodeButton.disabled = true;
     decodeInput.disabled = true;
 
-    feedback.textContent = 'CLAVE ACEPTADA: "EL YO ES ILUSIÓN". Contradicción confirmada en el núcleo del Juez Cibernético. Sistema desestabilizado. Los anclajes del hangar comienzan a fallar...';
+    feedback.textContent = 'CLAVE ACEPTADA: "FM ZP FT JMVTJPO". Verificación de doble capa superada. El mensaje real, "EL YO ES ILUSIÓN", ha sido inyectado en el núcleo del Juez Cibernético. Sistema desestabilizado. Los anclajes del hangar comienzan a fallar...';
     feedback.className = 'feedback success';
 
     document.body.classList.add('success-flash');
@@ -805,7 +805,7 @@
     if (normalize(raw) === normalize(ANSWER)){
       onSuccess();
     } else {
-      feedback.textContent = 'DESCIFRADO INCORRECTO. Revisa el desplazamiento (+3) y vuelve a intentarlo.';
+      feedback.textContent = 'DESCIFRADO INCORRECTO. Revisa tu método de descifrado y vuelve a intentarlo.';
       feedback.className = 'feedback error';
       shakeElement(decodeModule);
     }
